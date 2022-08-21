@@ -1,0 +1,12 @@
+@import 'https://fonts.googleapis.com/css?family=Kanit|Prompt';
+    body,
+    html {
+      height: 100%;
+      font-family: 'Kanit' , sans-serif !important;
+      font-size: 0.95rem !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
