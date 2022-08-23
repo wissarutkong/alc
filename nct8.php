@@ -4,6 +4,11 @@ header('Access-Control-Allow-Origin: *');
 require_once 'service/db/cons.php';
 require("service/phpMQTT.php");
 
+ini_set('display_errors', 'On');
+
+error_reporting(E_STRICT);
+date_default_timezone_set('Asia/Bangkok');
+
 $query1 = $_GET['query'];
 $buffgsm = explode(",", $query1);
 
