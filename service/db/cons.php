@@ -14,6 +14,7 @@ class Database {
      * @var string|null
      * @return PDO
      */
+    #private $host = "localhost";
     private $host = "35.187.251.120";
     private $dbname = "alc_system";
     private $username = "stdesign";
