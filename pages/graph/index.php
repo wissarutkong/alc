@@ -10,6 +10,18 @@ require_once '../authen.php';
     <script src="../../assets/plugins/moment/moment.min.js"></script>
     <!-- daterange picker -->
     <link rel="stylesheet" href="../../assets/plugins/daterangepicker/daterangepicker.css">
+
+    <script src="../../assets/plugins/amcharts_4/core.js"></script>
+    <script src="../../assets/plugins/amcharts_4/charts.js"></script>
+    <script src="../../assets/plugins/amcharts_4/themes/animated.js"></script>
+    <script src="../../assets/plugins/amcharts_4/lang/de_DE.js"></script>
+    <script src="../../assets/plugins/amcharts_4/fonts/notosans-sc.js"></script>
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini sidebar-collapse">
@@ -135,18 +147,20 @@ require_once '../authen.php';
                                             <a class="nav-link active" id="tab_graph_id" data-toggle="pill" href="#tab_graph" role="tab" aria-controls="tab_graph" aria-selected="true">กราฟข้อมูล</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill" href="#custom-content-below-profile" role="tab" aria-controls="custom-content-below-profile" aria-selected="false">ข้อมูล</a>
+                                            <a class="nav-link" id="tab_table_data_id" data-toggle="pill" href="#tab_table_data" role="tab" aria-controls="tab_table_data" aria-selected="false">ข้อมูล</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content">
                                         <div class="tab-pane fade show active" id="tab_graph" role="tabpanel" aria-labelledby="tab_graph_id">
                                             <div class="overlay-wrapper">
 
-                                                <div id="loading" style="display: none;"class="overlay"><i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                                                <div id="loading" style="display: none;" class="overlay"><i class="fas fa-3x fa-sync-alt fa-spin"></i>
                                                     <div class="text-bold pt-2">กำลังโหลดข้อมูล...</div>
                                                 </div>
 
-                                                <div class="d-flex">
+                                                <div id="chartdiv"></div>
+
+                                                <!-- <div class="d-flex">
                                                     <p class="d-flex flex-column">
                                                         <span class="text-bold text-lg">820</span>
                                                         <span>Visitors Over Time</span>
@@ -158,7 +172,7 @@ require_once '../authen.php';
                                                         <span class="text-muted">Since last week</span>
                                                     </p>
                                                 </div>
-                                                <!-- /.d-flex -->
+
 
                                                 <div class="position-relative mb-4">
                                                     <canvas id="visitors-chart" height="200"></canvas>
@@ -172,7 +186,46 @@ require_once '../authen.php';
                                                     <span>
                                                         <i class="fas fa-square text-gray"></i> Last Week
                                                     </span>
+                                                </div> -->
+                                            </div>
+
+                                        </div>
+                                        <div class="tab-pane fade show active" id="tab_table_data" role="tabpanel" aria-labelledby="tab_table_data_id">
+                                            <div class="overlay-wrapper">
+
+                                                <div id="loading" style="display: none;" class="overlay"><i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                                                    <div class="text-bold pt-2">กำลังโหลดข้อมูล...</div>
                                                 </div>
+
+
+
+                                                <!-- <div class="d-flex">
+                                                    <p class="d-flex flex-column">
+                                                        <span class="text-bold text-lg">820</span>
+                                                        <span>Visitors Over Time</span>
+                                                    </p>
+                                                    <p class="ml-auto d-flex flex-column text-right">
+                                                        <span class="text-success">
+                                                            <i class="fas fa-arrow-up"></i> 12.5%
+                                                        </span>
+                                                        <span class="text-muted">Since last week</span>
+                                                    </p>
+                                                </div>
+
+
+                                                <div class="position-relative mb-4">
+                                                    <canvas id="visitors-chart" height="200"></canvas>
+                                                </div>
+
+                                                <div class="d-flex flex-row justify-content-end">
+                                                    <span class="mr-2">
+                                                        <i class="fas fa-square text-primary"></i> This Week
+                                                    </span>
+
+                                                    <span>
+                                                        <i class="fas fa-square text-gray"></i> Last Week
+                                                    </span>
+                                                </div> -->
                                             </div>
 
                                         </div>
@@ -271,7 +324,8 @@ require_once '../authen.php';
                     var formData = $('#formGraphsearch').serialize() + '&datetime=' + $('#search_daterange').val()
                     setTimeout(() => {
                         document.getElementById('loading').style.display = 'none'
-                    }, 10000)
+                        generategraph()
+                    }, 2000)
                     // console.log($('#search_daterange').val());
                     // console.log(startDate.format('YYYY-MM-DD HH:mm:ss'));
                     // console.log(endDate.format('YYYY-MM-DD HH:mm:ss'));
@@ -286,7 +340,228 @@ require_once '../authen.php';
                     // })
                 });
 
+
+                function generategraph() {
+                    // Themes begin
+                    am4core.useTheme(am4themes_animated);
+                    // Themes end
+
+                    // Create chart instance
+                    var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+                    //
+
+                    // Increase contrast by taking evey second color
+                    chart.colors.step = 2;
+
+                    // Add data
+                    chart.data = generateChartData();
+
+                    // Create axes
+                    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                    dateAxis.renderer.minGridDistance = 50;
+
+                    // Create series
+                    function createAxisAndSeries(field, name, opposite) {
+                        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                        if (chart.yAxes.indexOf(valueAxis) != 0) {
+                            valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
+                        }
+
+                        var color_random = getRandomColor();
+
+                        var series = chart.series.push(new am4charts.LineSeries());
+                        series.dataFields.valueY = field;
+                        series.dataFields.dateX = "date";
+                        series.strokeWidth = 1.8;
+                        series.yAxis = valueAxis;
+                        series.fill = am4core.color(color_random);
+                        series.stroke = am4core.color(color_random);
+                        series.name = name;
+                        series.tooltipText = "{name}: [bold]{valueY}[/]";
+                        // series.tensionX = 0.8;
+                        series.showOnInit = true;
+
+                        valueAxis.renderer.line.strokeOpacity = 0.3;
+                        valueAxis.renderer.line.strokeWidth = 0.5;
+                        valueAxis.renderer.line.stroke = series.stroke;
+                        valueAxis.renderer.labels.template.fill = am4core.color("#000000");
+                        valueAxis.title.text = series.name;
+                        valueAxis.renderer.opposite = opposite;
+                    }
+
+                    createAxisAndSeries("visits", "Pressure", false);
+                    createAxisAndSeries("views", "Flow", true);
+                    createAxisAndSeries("hits", "CSQ", true);
+
+                    // Add legend
+                    chart.legend = new am4charts.Legend();
+
+                    // Add cursor
+                    chart.cursor = new am4charts.XYCursor();
+                    chart.scrollbarX = new am4core.Scrollbar();
+
+                    // generate some random data, quite different range
+                    function generateChartData() {
+                        var chartData = [];
+                        var firstDate = new Date();
+                        firstDate.setDate(firstDate.getDate() - 100);
+                        firstDate.setHours(0, 0, 0, 0);
+
+                        var visits = 1600;
+                        var hits = 2900;
+                        var views = 8700;
+
+                        for (var i = 0; i < 60; i++) {
+                            // we create date objects here. In your data, you can have date strings
+                            // and then set format of your dates using chart.dataDateFormat property,
+                            // however when possible, use date objects, as this will speed up chart rendering.
+                            var newDate = new Date(firstDate);
+                            newDate.setDate(newDate.getDate() + i);
+
+                            visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+                            hits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+                            views += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+
+                            chartData.push({
+                                date: newDate,
+                                visits: visits,
+                                hits: hits,
+                                views: views
+                            });
+                        }
+                        return chartData;
+                    }
+
+                    function getRandomColor() {
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    }
+
+                    function random_rgba() {
+                        var o = Math.round,
+                            r = Math.random,
+                            s = 255;
+                        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
+                    }
+                }
+
             })
+        </script>
+
+        <script>
+            // am4core.ready(function() {
+
+            //     // Themes begin
+            //     am4core.useTheme(am4themes_animated);
+            //     // Themes end
+
+            //     // Create chart instance
+            //     var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+            //     //
+
+            //     // Increase contrast by taking evey second color
+            //     // chart.colors.step = 2;
+
+            //     // Add data
+            //     chart.data = generateChartData();
+
+            //     // Create axes
+            //     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            //     dateAxis.renderer.minGridDistance = 50;
+
+            //     // Create series
+            //     function createAxisAndSeries(field, name, opposite, bullet) {
+            //         var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            //         if (chart.yAxes.indexOf(valueAxis) != 0) {
+            //             valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
+            //         }
+
+            //         var series = chart.series.push(new am4charts.LineSeries());
+            //         series.dataFields.valueY = field;
+            //         series.dataFields.dateX = "date";
+            //         series.strokeWidth = 1.5;
+            //         series.yAxis = valueAxis;
+            //         // series.fill = am4core.color(random_rgba());
+            //         series.stroke = am4core.color(random_rgba());
+            //         // series.yAxis.color = 
+            //         series.name = name;
+            //         series.tooltipText = "{name}: [bold]{valueY}[/]";
+            //         // series.tensionX = 0.8;
+            //         series.showOnInit = true;
+
+            //         valueAxis.renderer.line.strokeOpacity = 0.3;
+            //         valueAxis.renderer.line.strokeWidth = 0.5;
+            //         valueAxis.renderer.line.stroke = series.stroke;
+            //         valueAxis.renderer.labels.template.fill = am4core.color("#000000");
+            //         valueAxis.renderer.opposite = opposite;
+            //     }
+
+            //     createAxisAndSeries("visits", "Visits", false);
+            //     createAxisAndSeries("views", "Views", true);
+            //     createAxisAndSeries("hits", "Hits", true);
+
+            //     // Add legend
+            //     chart.legend = new am4charts.Legend();
+
+            //     // Add cursor
+            //     chart.cursor = new am4charts.XYCursor();
+            //     chart.scrollbarX = new am4core.Scrollbar();
+
+            //     // generate some random data, quite different range
+            //     function generateChartData() {
+            //         var chartData = [];
+            //         var firstDate = new Date();
+            //         firstDate.setDate(firstDate.getDate() - 100);
+            //         firstDate.setHours(0, 0, 0, 0);
+
+            //         var visits = 1600;
+            //         var hits = 2900;
+            //         var views = 8700;
+
+            //         for (var i = 0; i < 60; i++) {
+            //             // we create date objects here. In your data, you can have date strings
+            //             // and then set format of your dates using chart.dataDateFormat property,
+            //             // however when possible, use date objects, as this will speed up chart rendering.
+            //             var newDate = new Date(firstDate);
+            //             newDate.setDate(newDate.getDate() + i);
+
+            //             visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+            //             hits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+            //             views += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+
+            //             chartData.push({
+            //                 date: newDate,
+            //                 visits: visits,
+            //                 hits: hits,
+            //                 views: views
+            //             });
+            //         }
+            //         return chartData;
+            //     }
+
+            //     function getRandomColor() {
+            //         var letters = '0123456789ABCDEF';
+            //         var color = '#';
+            //         for (var i = 0; i < 6; i++) {
+            //             color += letters[Math.floor(Math.random() * 16)];
+            //         }
+            //         return color;
+            //     }
+
+            //     function random_rgba() {
+            //         var o = Math.round,
+            //             r = Math.random,
+            //             s = 255;
+            //         return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
+            //     }
+
+            // }); // end am4core.ready()
         </script>
     </div>
 </body>
