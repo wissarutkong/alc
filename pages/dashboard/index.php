@@ -212,7 +212,7 @@ include_once '../authen.php';
           const clientId = "st" + parseInt(Math.random() * 100000, 10);
           const path = "/mqtt";
 
-          client = new Paho.MQTT.Client(hostname, Number(port), path, clientId);
+          client = new Paho.MQTT.Client(hostname, Number(port), path, clientId , transport='websockets');
           client.onConnectionLost = onConnectionLost;
           client.onMessageArrived = onMessageArrived;
 
