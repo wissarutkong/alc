@@ -1,6 +1,12 @@
 <?php
-
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Headers: *");
 require_once 'service/db/cons.php';
+
+ini_set('display_errors', 'On');
+
+error_reporting(E_STRICT);
+date_default_timezone_set('Asia/Bangkok');
 
 $query1 = $_GET['query'];
 $buffgsm = explode(",", $query1);
