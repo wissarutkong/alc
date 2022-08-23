@@ -206,7 +206,7 @@ include_once '../authen.php';
           // const clientId = "dma" + parseInt(Math.random() * 100000, 10);
           // const path = "/mqtt";
 
-          const hostname = "localhost";
+          const hostname = "127.0.0.1";
           // const hostname = "35.187.251.120";
           const port = "8083";
           const clientId = "st" + parseInt(Math.random() * 100000, 10);
