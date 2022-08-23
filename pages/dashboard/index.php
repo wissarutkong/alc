@@ -208,7 +208,7 @@ include_once '../authen.php';
 
           const hostname = "localhost";
           // const hostname = "35.187.251.120";
-          const port = "1883";
+          const port = "8083";
           const clientId = "st" + parseInt(Math.random() * 100000, 10);
           const path = "/mqtt";
 
@@ -238,7 +238,7 @@ include_once '../authen.php';
         }
 
         function onMessageArrived(message) {
-          // console.log("onMessageArrived:" + message.payloadString);
+          console.log("onMessageArrived:" + message.payloadString);
           var message_mqtt = JSON.parse(message.payloadString)
 
           if (message_mqtt.flow === undefined || message_mqtt.p_out === undefined) {
