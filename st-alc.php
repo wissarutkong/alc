@@ -1,7 +1,7 @@
 <?php
 
-require_once '../db/cons.php';
-require("../phpMQTT.php");
+require_once 'service/db/cons.php';
+require("service/phpMQTT.php");
 
 $query1 = $_GET['query'];
 $buffgsm = explode(",", $query1);
@@ -62,8 +62,8 @@ try {
 
 function publish_mqtt($topic, $message)
 {
-    #$server  = "localhost";
-    $server  = "35.187.251.120";
+    $server  = "localhost";
+    // $server  = "35.187.251.120";
     $port  = 1883;
     $client_id = "Client-" . rand();
     $mqtt = new phpMQTT($server, $port, $client_id);
