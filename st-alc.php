@@ -41,6 +41,7 @@ try {
 
     $topic = 'relogger/' . $id_name;
     $message = array(
+        'id' => $id_name,
         'p_out' => $Ai1,
         'p_in' => $Ai2,
         'flow' => $io5_counter,
