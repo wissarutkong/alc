@@ -190,8 +190,9 @@ include_once '../authen.php';
             showPage()
 
           }).catch((error) => {
+            console.log(error);
             toastr.error("ไม่สามารถเรียกดูข้อมูลได้").then(() => {
-              console.log(error);
+              
             })
           })
         }
@@ -206,9 +207,9 @@ include_once '../authen.php';
           // const clientId = "dma" + parseInt(Math.random() * 100000, 10);
           // const path = "/mqtt";
 
-          const hostname = "localhost";
-          // const hostname = "35.187.251.120";
-          const port = "1883";
+          // const hostname = "localhost";
+          const hostname = "35.187.251.120";
+          const port = "8083";
           const clientId = "st" + parseInt(Math.random() * 100000, 10);
           const path = "/mqtt";
 
