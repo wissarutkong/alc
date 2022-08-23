@@ -159,7 +159,7 @@ include_once '../authen.php';
                   // console.log(data_temp);
                   html_table += "<tr data-node-id='" + data_temp.key + "' data-node-pid='" + key + "'>"
                   html_table += "<td>" + data_temp.device_id + "</td>"
-                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-pressure'></span></td>"
+                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-p_out'></span></td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flow'></span></td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-datetime'></span></td>"
                   html_table += "</tr>"
@@ -201,9 +201,14 @@ include_once '../authen.php';
         function inialize(device_topic) {
           topic = device_topic
 
-          const hostname = "dmama2.pwa.co.th";
-          const port = "443";
-          const clientId = "dma" + parseInt(Math.random() * 100000, 10);
+          // const hostname = "dmama2.pwa.co.th";
+          // const port = "443";
+          // const clientId = "dma" + parseInt(Math.random() * 100000, 10);
+          // const path = "/mqtt";
+
+          const hostname = "35.187.251.120";
+          const port = "1883";
+          const clientId = "st" + parseInt(Math.random() * 100000, 10);
           const path = "/mqtt";
 
           client = new Paho.MQTT.Client(hostname, Number(port), path, clientId);
@@ -221,7 +226,7 @@ include_once '../authen.php';
         function onConnect() {
           console.log("mqttConnect");
           $.each(topic, function(index, value) {
-            client.subscribe("relogger/" + value + "/mapped");
+            client.subscribe("relogger/" + value + "");
           })
         }
 
@@ -235,12 +240,12 @@ include_once '../authen.php';
           // console.log("onMessageArrived:" + message.payloadString);
           var message_mqtt = JSON.parse(message.payloadString)
 
-          if (message_mqtt.flow === undefined || message_mqtt.pressure === undefined) {
+          if (message_mqtt.flow === undefined || message_mqtt.p_out === undefined) {
             message_mqtt.flow = "-"
-            message_mqtt.pressure = "-"
+            message_mqtt.p_out = "-"
           }
 
-          $('.' + message_mqtt.id + '-pressure').text(String(message_mqtt.pressure))
+          $('.' + message_mqtt.id + '-p_out').text(String(message_mqtt.p_out))
           $('.' + message_mqtt.id + '-flow').text(String(message_mqtt.flow))
           $('.' + message_mqtt.id + '-datetime').text(String(message_mqtt.datetime))
         }

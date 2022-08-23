@@ -207,8 +207,11 @@ require_once '../authen.php';
                     ).then((data) => {
                         toastr.success(data.message)
                         $('#site_modal').modal('hide');
-                        $('#select_ddl_search_company').val('').trigger('change')
-                        // getDatatable()
+                        if (permissions == 1) {
+                            $('#select_ddl_search_company').val('').trigger('change')
+                        }else{
+                            getDatatable('')
+                        }
                     }).catch((error) => {
                         toastr.error(error.status)
                     })
