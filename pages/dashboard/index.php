@@ -149,6 +149,8 @@ include_once '../authen.php';
             device_topic = []
             html_table = "";
 
+            console.log(data);
+
             Object.keys(data.response).forEach(key => {
               // console.log(key, data.response[key]);
               Object.keys(data.response[key]).forEach(key_1 => {
@@ -156,9 +158,9 @@ include_once '../authen.php';
                 Object.keys(data.response[key][key_1]).forEach(key_2 => {
                   // console.log(key_1);
                   var data_temp = data.response[key][key_1][key_2]
-                  // console.log(data_temp);
+                  console.log(data_temp);
                   html_table += "<tr data-node-id='" + data_temp.key + "' data-node-pid='" + key + "'>"
-                  html_table += "<td>" + data_temp.device_id + "</td>"
+                  html_table += "<td data-toggle='tooltip' data-placement='top' title='" + data_temp.device_id + "'>" + data_temp.device_desc + "</td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-p_out'></span></td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flow'></span></td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-datetime'></span></td>"
@@ -187,12 +189,13 @@ include_once '../authen.php';
             });
 
             inialize(device_topic)
+
             showPage()
 
           }).catch((error) => {
             console.log(error);
             toastr.error("ไม่สามารถเรียกดูข้อมูลได้").then(() => {
-              
+
             })
           })
         }

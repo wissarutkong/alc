@@ -45,6 +45,7 @@ site_id ASC");
                     $key_sub = $key_main . "." . $temp;
                     $mainlist[$key+1][$val['site_desc']][$key_list]['key'] = $key_sub;
                     $mainlist[$key+1][$val['site_desc']][$key_list]['device_id'] = $val_list['device_id'];
+                    $mainlist[$key+1][$val['site_desc']][$key_list]['device_desc'] = $val_list['device_desc'];
                     $temp = $temp + 1;
                 }
             }
