@@ -10,12 +10,6 @@ require_once '../authen.php';
     <script src="../../assets/plugins/moment/moment.min.js"></script>
     <!-- daterange picker -->
     <link rel="stylesheet" href="../../assets/plugins/daterangepicker/daterangepicker.css">
-
-    <script src="../../assets/plugins/amcharts_4/core.js"></script>
-    <script src="../../assets/plugins/amcharts_4/charts.js"></script>
-    <script src="../../assets/plugins/amcharts_4/themes/animated.js"></script>
-    <script src="../../assets/plugins/amcharts_4/lang/de_DE.js"></script>
-    <script src="../../assets/plugins/amcharts_4/fonts/notosans-sc.js"></script>
     <style>
         #chartdiv {
             width: 100%;
@@ -322,13 +316,16 @@ require_once '../authen.php';
                     e.preventDefault()
                     document.getElementById('loading').style.display = 'flex'
                     var formData = $('#formGraphsearch').serialize() + '&datetime=' + $('#search_daterange').val()
+                    
                     setTimeout(() => {
                         document.getElementById('loading').style.display = 'none'
                         generategraph()
                     }, 2000)
+
+                    // console.log(formData);
                     // console.log($('#search_daterange').val());
-                    // console.log(startDate.format('YYYY-MM-DD HH:mm:ss'));
-                    // console.log(endDate.format('YYYY-MM-DD HH:mm:ss'));
+                    console.log(startDate.format('YYYY-MM-DD HH:mm:ss')); //วนัที่เริ่ม
+                    console.log(endDate.format('YYYY-MM-DD HH:mm:ss')); //วันที่สิ้นสุด
                     // CallAPI('POST', $company_id != "" ? '../../service/company/update.php' : '../../service/company/create.php',
                     //     formData
                     // ).then((data) => {
@@ -340,117 +337,118 @@ require_once '../authen.php';
                     // })
                 });
 
+            })
 
-                function generategraph() {
-                    // Themes begin
-                    am4core.useTheme(am4themes_animated);
-                    // Themes end
+            function generategraph() {
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
 
-                    // Create chart instance
-                    var chart = am4core.create("chartdiv", am4charts.XYChart);
+                // Create chart instance
+                var chart = am4core.create("chartdiv", am4charts.XYChart);
 
-                    //
+                //
 
-                    // Increase contrast by taking evey second color
-                    chart.colors.step = 2;
+                // Increase contrast by taking evey second color
+                chart.colors.step = 2;
 
-                    // Add data
-                    chart.data = generateChartData();
+                // Add data
+                chart.data = generateChartData();
 
-                    // Create axes
-                    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-                    dateAxis.renderer.minGridDistance = 50;
+                // Create axes
+                var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                dateAxis.renderer.minGridDistance = 50;
 
-                    // Create series
-                    function createAxisAndSeries(field, name, opposite) {
-                        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-                        if (chart.yAxes.indexOf(valueAxis) != 0) {
-                            valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
-                        }
-
-                        var color_random = getRandomColor();
-
-                        var series = chart.series.push(new am4charts.LineSeries());
-                        series.dataFields.valueY = field;
-                        series.dataFields.dateX = "date";
-                        series.strokeWidth = 1.8;
-                        series.yAxis = valueAxis;
-                        series.fill = am4core.color(color_random);
-                        series.stroke = am4core.color(color_random);
-                        series.name = name;
-                        series.tooltipText = "{name}: [bold]{valueY}[/]";
-                        // series.tensionX = 0.8;
-                        series.showOnInit = true;
-
-                        valueAxis.renderer.line.strokeOpacity = 0.3;
-                        valueAxis.renderer.line.strokeWidth = 0.5;
-                        valueAxis.renderer.line.stroke = series.stroke;
-                        valueAxis.renderer.labels.template.fill = am4core.color("#000000");
-                        valueAxis.title.text = series.name;
-                        valueAxis.renderer.opposite = opposite;
+                // Create series
+                function createAxisAndSeries(field, name, opposite) {
+                    var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                    if (chart.yAxes.indexOf(valueAxis) != 0) {
+                        valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
                     }
 
-                    createAxisAndSeries("visits", "Pressure", false);
-                    createAxisAndSeries("views", "Flow", true);
-                    createAxisAndSeries("hits", "CSQ", true);
+                    var color_random = getRandomColor();
 
-                    // Add legend
-                    chart.legend = new am4charts.Legend();
+                    var series = chart.series.push(new am4charts.LineSeries());
+                    series.dataFields.valueY = field;
+                    series.dataFields.dateX = "date";
+                    series.strokeWidth = 1.8;
+                    series.yAxis = valueAxis;
+                    series.fill = am4core.color(color_random);
+                    series.stroke = am4core.color(color_random);
+                    series.name = name;
+                    series.tooltipText = "{name}: [bold]{valueY}[/]";
+                    // series.tensionX = 0.8;
+                    series.showOnInit = true;
 
-                    // Add cursor
-                    chart.cursor = new am4charts.XYCursor();
-                    chart.scrollbarX = new am4core.Scrollbar();
-
-                    // generate some random data, quite different range
-                    function generateChartData() {
-                        var chartData = [];
-                        var firstDate = new Date();
-                        firstDate.setDate(firstDate.getDate() - 100);
-                        firstDate.setHours(0, 0, 0, 0);
-
-                        var visits = 1600;
-                        var hits = 2900;
-                        var views = 8700;
-
-                        for (var i = 0; i < 60; i++) {
-                            // we create date objects here. In your data, you can have date strings
-                            // and then set format of your dates using chart.dataDateFormat property,
-                            // however when possible, use date objects, as this will speed up chart rendering.
-                            var newDate = new Date(firstDate);
-                            newDate.setDate(newDate.getDate() + i);
-
-                            visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-                            hits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-                            views += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-
-                            chartData.push({
-                                date: newDate,
-                                visits: visits,
-                                hits: hits,
-                                views: views
-                            });
-                        }
-                        return chartData;
-                    }
-
-                    function getRandomColor() {
-                        var letters = '0123456789ABCDEF';
-                        var color = '#';
-                        for (var i = 0; i < 6; i++) {
-                            color += letters[Math.floor(Math.random() * 16)];
-                        }
-                        return color;
-                    }
-
-                    function random_rgba() {
-                        var o = Math.round,
-                            r = Math.random,
-                            s = 255;
-                        return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
-                    }
+                    valueAxis.renderer.line.strokeOpacity = 0.3;
+                    valueAxis.renderer.line.strokeWidth = 0.5;
+                    valueAxis.renderer.line.stroke = series.stroke;
+                    valueAxis.renderer.labels.template.fill = am4core.color("#000000");
+                    valueAxis.title.text = series.name;
+                    valueAxis.renderer.opposite = opposite;
                 }
 
-            })
+                createAxisAndSeries("visits", "Pressure", false);
+                createAxisAndSeries("views", "Flow", true);
+                createAxisAndSeries("hits", "CSQ", true);
+
+                // Add legend
+                chart.legend = new am4charts.Legend();
+
+                // Add cursor
+                chart.cursor = new am4charts.XYCursor();
+                chart.scrollbarX = new am4core.Scrollbar();
+
+                // generate some random data, quite different range
+                function generateChartData() {
+                    var chartData = [];
+                    var firstDate = new Date();
+                    firstDate.setDate(firstDate.getDate() - 100);
+                    firstDate.setHours(0, 0, 0, 0);
+
+                    var visits = 1600;
+                    var hits = 2900;
+                    var views = 8700;
+
+                    for (var i = 0; i < 60; i++) {
+                        // we create date objects here. In your data, you can have date strings
+                        // and then set format of your dates using chart.dataDateFormat property,
+                        // however when possible, use date objects, as this will speed up chart rendering.
+                        var newDate = new Date(firstDate);
+                        newDate.setDate(newDate.getDate() + i);
+
+                        visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+                        hits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+                        views += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
+
+                        chartData.push({
+                            date: newDate,
+                            visits: visits,
+                            hits: hits,
+                            views: views
+                        });
+                    }
+
+                    console.log(chartData);
+                    return chartData;
+                }
+
+                function getRandomColor() {
+                    var letters = '0123456789ABCDEF';
+                    var color = '#';
+                    for (var i = 0; i < 6; i++) {
+                        color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    return color;
+                }
+
+                function random_rgba() {
+                    var o = Math.round,
+                        r = Math.random,
+                        s = 255;
+                    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
+                }
+            }
         </script>
 
         <script>
