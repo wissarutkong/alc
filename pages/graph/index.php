@@ -10,6 +10,11 @@ require_once '../authen.php';
     <script src="../../assets/plugins/moment/moment.min.js"></script>
     <!-- daterange picker -->
     <link rel="stylesheet" href="../../assets/plugins/daterangepicker/daterangepicker.css">
+    <script src="../../assets/plugins/amcharts_4/core.js"></script>
+    <script src="../../assets/plugins/amcharts_4/charts.js"></script>
+    <script src="../../assets/plugins/amcharts_4/themes/animated.js"></script>
+    <!-- <script src="../../assets/plugins/amcharts_4/lang/de_DE.js"></script> -->
+    <!-- <script src="../../assets/plugins/amcharts_4/fonts/notosans-sc.js"></script> -->
     <style>
         #chartdiv {
             width: 100%;
