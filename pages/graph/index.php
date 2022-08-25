@@ -159,6 +159,8 @@ require_once '../authen.php';
 
                                                 <div id="chartdiv"></div>
 
+
+
                                                 <!-- <div class="d-flex">
                                                     <p class="d-flex flex-column">
                                                         <span class="text-bold text-lg">820</span>
@@ -274,7 +276,7 @@ require_once '../authen.php';
                         }
                     },
                     function(start, end, label) {
-                        console.log("Callback has been called!");
+                        // console.log("Callback has been called!");
                         // console.log(start.format('YYYY-MM-DD HH:mm:ss') + ' - ' + end.format('YYYY-MM-DD HH:mm:ss'));
                         startDate = start;
                         endDate = end;
@@ -312,58 +314,85 @@ require_once '../authen.php';
 
                 // console.log(startDate);
 
+                let datetime_from
+                let datetime_to
+
                 $('#search_daterange').on('apply.daterangepicker', function(ev, picker) {
                     $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm:ss') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm:ss'));
+                    datetime_from = picker.startDate.format('YYYY-MM-DD HH:mm:ss')
+                    datetime_to = picker.endDate.format('YYYY-MM-DD HH:mm:ss')
                 });
 
 
                 $('#formGraphsearch').on('submit', function(e) {
                     e.preventDefault()
                     document.getElementById('loading').style.display = 'flex'
-                    var formData = $('#formGraphsearch').serialize() + '&datetime=' + $('#search_daterange').val()
-                    
-                    setTimeout(() => {
-                        document.getElementById('loading').style.display = 'none'
-                        generategraph()
-                    }, 2000)
+                    // console.log(datetime_from); //วันที่เริ่ม
+                    // console.log(datetime_to); //วันที่สิ้นสุด
 
-                    // console.log(formData);
-                    // console.log($('#search_daterange').val());
-                    console.log(startDate.format('YYYY-MM-DD HH:mm:ss')); //วนัที่เริ่ม
-                    console.log(endDate.format('YYYY-MM-DD HH:mm:ss')); //วันที่สิ้นสุด
-                    // CallAPI('POST', $company_id != "" ? '../../service/company/update.php' : '../../service/company/create.php',
-                    //     formData
-                    // ).then((data) => {
-                    //     toastr.success(data.message)
-                    //     $('#company_modal').modal('hide');
-                    //     getDatatable()
-                    // }).catch((error) => {
-                    //     toastr.error(error.status)
-                    // })
+                    var formData = $('#formGraphsearch').serialize() + '&datetime_from=' + datetime_from + '&datetime_to=' + datetime_to
+
+                    // setTimeout(() => {
+                    //     document.getElementById('loading').style.display = 'none'
+                    //     generategraph()
+                    // }, 1000)
+
+                    CallAPI('GET', '../../service/graph/store.php',
+                        formData
+                    ).then((data) => {
+                        document.getElementById('loading').style.display = 'none'
+
+                        chartDataGraph = data.response.chartdata[0]
+                        chartColumn = data.response.columndata[0]
+
+                        // console.log(chartDataGraph);
+                        // console.log(chartColumn);
+
+                        // chartColumn.forEach(function(item, index) {
+                        //     console.log(index);
+                        //     console.log(item);
+                        // })
+
+                        generategraph(chartDataGraph, chartColumn)
+
+                    }).catch((error) => {
+                        // toastr.error(error.status)
+                        console.log(error);
+                    })
                 });
 
             })
 
-            function generategraph() {
+            function generategraph(chartDataGraph, chartColumn) {
                 // Themes begin
                 am4core.useTheme(am4themes_animated);
                 // Themes end
 
                 // Create chart instance
                 var chart = am4core.create("chartdiv", am4charts.XYChart);
-
-                //
-
+                chart.dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss";
                 // Increase contrast by taking evey second color
-                chart.colors.step = 2;
-
+                // chart.colors.step = 2;
                 // Add data
                 chart.data = generateChartData();
 
                 // Create axes
                 var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-                dateAxis.renderer.minGridDistance = 50;
+                dateAxis.renderer.grid.template.location = 0.5;
+                dateAxis.renderer.minGridDistance = 50
+                dateAxis.dateFormats.setKey("day", "d MMM");
+                dateAxis.periodChangeDateFormats.setKey("day", "d MMM");
+                dateAxis.dateFormats.setKey("hour", "d HH:mm");
+                dateAxis.periodChangeDateFormats.setKey("hour", "d HH:mm");
+                dateAxis.dateFormats.setKey("minute", "d HH:mm");
+                dateAxis.periodChangeDateFormats.setKey("minute", "d HH:mm");
+                dateAxis.dateFormats.setKey("month", "d MMM");
+                dateAxis.periodChangeDateFormats.setKey("month", "d MMM");
+                dateAxis.dateFormats.setKey("week", "d MMM");
+                dateAxis.periodChangeDateFormats.setKey("week", "d MMM");
 
+
+                const color_dict = ["#a367dc", "#67b7dc", "#daa520", "#dc67ce", "#339933", "#993300", "#003399", "#660066", "#0e2f44", "#ff9900", "#f6546a", "#b4eeb4", "#008000", "#00ced1", "#468499", "#ff7f50", "#333333", "#666633", "#6897bb", "#20b2aa", "#c39797", "#ffff00", "#008080", "#133337"]
                 // Create series
                 function createAxisAndSeries(field, name, opposite) {
                     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -372,7 +401,6 @@ require_once '../authen.php';
                     }
 
                     var color_random = getRandomColor();
-
                     var series = chart.series.push(new am4charts.LineSeries());
                     series.dataFields.valueY = field;
                     series.dataFields.dateX = "date";
@@ -392,6 +420,17 @@ require_once '../authen.php';
                     valueAxis.title.text = series.name;
                     valueAxis.renderer.opposite = opposite;
                 }
+
+                // chartColumn.forEach(function(item, index) {
+                //     if (index == 0) {
+                //         createAxisAndSeries(item, item, false);
+                //     } else {
+                //         createAxisAndSeries(item, item, true);
+                //     }
+                // })
+
+                // console.log(chartDataGraph);
+                // console.log(generateChartData());
 
                 createAxisAndSeries("visits", "Pressure", false);
                 createAxisAndSeries("views", "Flow", true);
