@@ -327,15 +327,8 @@ require_once '../authen.php';
                 $('#formGraphsearch').on('submit', function(e) {
                     e.preventDefault()
                     document.getElementById('loading').style.display = 'flex'
-                    // console.log(datetime_from); //วันที่เริ่ม
-                    // console.log(datetime_to); //วันที่สิ้นสุด
 
                     var formData = $('#formGraphsearch').serialize() + '&datetime_from=' + datetime_from + '&datetime_to=' + datetime_to
-
-                    // setTimeout(() => {
-                    //     document.getElementById('loading').style.display = 'none'
-                    //     generategraph()
-                    // }, 1000)
 
                     CallAPI('GET', '../../service/graph/store.php',
                         formData
@@ -345,7 +338,29 @@ require_once '../authen.php';
                         chartDataGraph = data.response.chartdata[0]
                         chartColumn = data.response.columndata[0]
 
-                        // console.log(chartDataGraph);
+                        console.log(chartDataGraph);
+
+                        var my_columns = [];
+
+                        $.each(chartDataGraph[0], function(key, value) {
+                            var my_item = {};
+                            my_item.data = key;
+                            my_item.title = key;
+                            my_columns.push(my_item);
+                        });
+
+                        console.log(my_columns);
+
+                        let tableData = []
+
+                        chartDataGraph.forEach(function(item, index) {
+                            tableData.push([
+                                ++index,
+                            ])
+                        })
+
+                        console.log(tableData);
+
                         // console.log(chartColumn);
 
                         // chartColumn.forEach(function(item, index) {
@@ -370,16 +385,16 @@ require_once '../authen.php';
 
                 // Create chart instance
                 var chart = am4core.create("chartdiv", am4charts.XYChart);
-                chart.dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss";
+                chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
                 // Increase contrast by taking evey second color
-                // chart.colors.step = 2;
+                chart.colors.step = 2;
                 // Add data
-                chart.data = generateChartData();
+                chart.data = chartDataGraph;
 
                 // Create axes
-                var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-                dateAxis.renderer.grid.template.location = 0.5;
-                dateAxis.renderer.minGridDistance = 50
+                let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                dateAxis.renderer.grid.template.location = 0.0001;
+                dateAxis.renderer.minGridDistance = 60
                 dateAxis.dateFormats.setKey("day", "d MMM");
                 dateAxis.periodChangeDateFormats.setKey("day", "d MMM");
                 dateAxis.dateFormats.setKey("hour", "d HH:mm");
@@ -391,8 +406,8 @@ require_once '../authen.php';
                 dateAxis.dateFormats.setKey("week", "d MMM");
                 dateAxis.periodChangeDateFormats.setKey("week", "d MMM");
 
-
                 const color_dict = ["#a367dc", "#67b7dc", "#daa520", "#dc67ce", "#339933", "#993300", "#003399", "#660066", "#0e2f44", "#ff9900", "#f6546a", "#b4eeb4", "#008000", "#00ced1", "#468499", "#ff7f50", "#333333", "#666633", "#6897bb", "#20b2aa", "#c39797", "#ffff00", "#008080", "#133337"]
+
                 // Create series
                 function createAxisAndSeries(field, name, opposite) {
                     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -400,7 +415,9 @@ require_once '../authen.php';
                         valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
                     }
 
+                    // var color = color_dict[Math.floor(Math.random()*color_dict.length)];
                     var color_random = getRandomColor();
+
                     var series = chart.series.push(new am4charts.LineSeries());
                     series.dataFields.valueY = field;
                     series.dataFields.dateX = "date";
@@ -410,7 +427,7 @@ require_once '../authen.php';
                     series.stroke = am4core.color(color_random);
                     series.name = name;
                     series.tooltipText = "{name}: [bold]{valueY}[/]";
-                    // series.tensionX = 0.8;
+                    // series.tensionX = 0.85;
                     series.showOnInit = true;
 
                     valueAxis.renderer.line.strokeOpacity = 0.3;
@@ -419,22 +436,23 @@ require_once '../authen.php';
                     valueAxis.renderer.labels.template.fill = am4core.color("#000000");
                     valueAxis.title.text = series.name;
                     valueAxis.renderer.opposite = opposite;
+                    valueAxis.renderer.minGridDistance = 50
                 }
 
-                // chartColumn.forEach(function(item, index) {
-                //     if (index == 0) {
-                //         createAxisAndSeries(item, item, false);
-                //     } else {
-                //         createAxisAndSeries(item, item, true);
-                //     }
-                // })
+                chartColumn.forEach(function(item, index) {
+                    if (index == 0) {
+                        createAxisAndSeries(item, item, false);
+                    } else {
+                        createAxisAndSeries(item, item, true);
+                    }
+                })
 
                 // console.log(chartDataGraph);
                 // console.log(generateChartData());
 
-                createAxisAndSeries("visits", "Pressure", false);
-                createAxisAndSeries("views", "Flow", true);
-                createAxisAndSeries("hits", "CSQ", true);
+                // createAxisAndSeries("visits", "Pressure", false);
+                // createAxisAndSeries("views", "Flow", true);
+                // createAxisAndSeries("hits", "CSQ", true);
 
                 // Add legend
                 chart.legend = new am4charts.Legend();
