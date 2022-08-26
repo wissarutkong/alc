@@ -166,7 +166,7 @@ require_once '../permission.php';
                         ''
                     ).then((data) => {
                         let tableData = []
-
+                        console.log(data.response);
                         data.response.forEach(function(item, index) {
                             tableData.push([
                                 ++index,

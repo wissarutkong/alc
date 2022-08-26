@@ -198,6 +198,14 @@ require_once '../authen.php';
                                                     <div class="text-bold pt-2">กำลังโหลดข้อมูล...</div>
                                                 </div>
 
+                                                <div class="row mt-2">
+                                                    <div class="col-12">
+                                                        <table id="tables_datawithgraph" class="table table-hover" width="100%">
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+
 
 
                                                 <!-- <div class="d-flex">
@@ -338,7 +346,7 @@ require_once '../authen.php';
                         chartDataGraph = data.response.chartdata[0]
                         chartColumn = data.response.columndata[0]
 
-                        console.log(chartDataGraph);
+                        // console.log(chartDataGraph);
 
                         var my_columns = [];
 
@@ -346,20 +354,12 @@ require_once '../authen.php';
                             var my_item = {};
                             my_item.data = key;
                             my_item.title = key;
+                            my_item.className = 'align-middle';
                             my_columns.push(my_item);
                         });
 
-                        console.log(my_columns);
+                        // console.log(my_columns);
 
-                        let tableData = []
-
-                        chartDataGraph.forEach(function(item, index) {
-                            tableData.push([
-                                ++index,
-                            ])
-                        })
-
-                        console.log(tableData);
 
                         // console.log(chartColumn);
 
@@ -369,6 +369,10 @@ require_once '../authen.php';
                         // })
 
                         generategraph(chartDataGraph, chartColumn)
+
+                        initDataTables(chartDataGraph, my_columns).then((data) => {
+                            data.clear().rows.add(chartDataGraph).draw(true)
+                        })
 
                     }).catch((error) => {
                         // toastr.error(error.status)
@@ -394,7 +398,7 @@ require_once '../authen.php';
                 // Create axes
                 let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
                 dateAxis.renderer.grid.template.location = 0.0001;
-                dateAxis.renderer.minGridDistance = 60
+                dateAxis.renderer.minGridDistance = 100
                 dateAxis.dateFormats.setKey("day", "d MMM");
                 dateAxis.periodChangeDateFormats.setKey("day", "d MMM");
                 dateAxis.dateFormats.setKey("hour", "d HH:mm");
@@ -511,117 +515,48 @@ require_once '../authen.php';
                     return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
                 }
             }
-        </script>
 
-        <script>
-            // am4core.ready(function() {
+            function initDataTables(tableData, column_dynamic) {
 
-            //     // Themes begin
-            //     am4core.useTheme(am4themes_animated);
-            //     // Themes end
+                var $table = $('#tables_datawithgraph').DataTable({
+                    data: tableData,
+                    // dom: 'Bfrtip',
+                    "info": false,
+                    "destroy": true,
+                    "processing": true,
+                    columns: column_dynamic,
+                    initComplete: function() {
 
-            //     // Create chart instance
-            //     var chart = am4core.create("chartdiv", am4charts.XYChart);
+                    },
+                    responsive: {
+                        details: {
+                            display: $.fn.dataTable.Responsive.display.modal({
+                                header: function(row) {
+                                    var data = row.data()
+                                    return data[1]
+                                }
+                            }),
+                            renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                                tableClass: 'table'
+                            })
+                        }
+                    },
+                    language: {
+                        "lengthMenu": "แสดงข้อมูล _MENU_ แถว",
+                        "zeroRecords": "ไม่พบข้อมูลที่ต้องการ",
+                        "info": "แสดงหน้า _PAGE_ จาก _PAGES_",
+                        "infoEmpty": "ไม่พบข้อมูลที่ต้องการ",
+                        "infoFiltered": "(filtered from _MAX_ total records)",
+                        "search": 'ค้นหา',
+                        "paginate": {
+                            "previous": "ก่อนหน้านี้",
+                            "next": "หน้าต่อไป"
+                        }
+                    },
+                })
 
-            //     //
-
-            //     // Increase contrast by taking evey second color
-            //     // chart.colors.step = 2;
-
-            //     // Add data
-            //     chart.data = generateChartData();
-
-            //     // Create axes
-            //     var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-            //     dateAxis.renderer.minGridDistance = 50;
-
-            //     // Create series
-            //     function createAxisAndSeries(field, name, opposite, bullet) {
-            //         var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-            //         if (chart.yAxes.indexOf(valueAxis) != 0) {
-            //             valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
-            //         }
-
-            //         var series = chart.series.push(new am4charts.LineSeries());
-            //         series.dataFields.valueY = field;
-            //         series.dataFields.dateX = "date";
-            //         series.strokeWidth = 1.5;
-            //         series.yAxis = valueAxis;
-            //         // series.fill = am4core.color(random_rgba());
-            //         series.stroke = am4core.color(random_rgba());
-            //         // series.yAxis.color = 
-            //         series.name = name;
-            //         series.tooltipText = "{name}: [bold]{valueY}[/]";
-            //         // series.tensionX = 0.8;
-            //         series.showOnInit = true;
-
-            //         valueAxis.renderer.line.strokeOpacity = 0.3;
-            //         valueAxis.renderer.line.strokeWidth = 0.5;
-            //         valueAxis.renderer.line.stroke = series.stroke;
-            //         valueAxis.renderer.labels.template.fill = am4core.color("#000000");
-            //         valueAxis.renderer.opposite = opposite;
-            //     }
-
-            //     createAxisAndSeries("visits", "Visits", false);
-            //     createAxisAndSeries("views", "Views", true);
-            //     createAxisAndSeries("hits", "Hits", true);
-
-            //     // Add legend
-            //     chart.legend = new am4charts.Legend();
-
-            //     // Add cursor
-            //     chart.cursor = new am4charts.XYCursor();
-            //     chart.scrollbarX = new am4core.Scrollbar();
-
-            //     // generate some random data, quite different range
-            //     function generateChartData() {
-            //         var chartData = [];
-            //         var firstDate = new Date();
-            //         firstDate.setDate(firstDate.getDate() - 100);
-            //         firstDate.setHours(0, 0, 0, 0);
-
-            //         var visits = 1600;
-            //         var hits = 2900;
-            //         var views = 8700;
-
-            //         for (var i = 0; i < 60; i++) {
-            //             // we create date objects here. In your data, you can have date strings
-            //             // and then set format of your dates using chart.dataDateFormat property,
-            //             // however when possible, use date objects, as this will speed up chart rendering.
-            //             var newDate = new Date(firstDate);
-            //             newDate.setDate(newDate.getDate() + i);
-
-            //             visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-            //             hits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-            //             views += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-
-            //             chartData.push({
-            //                 date: newDate,
-            //                 visits: visits,
-            //                 hits: hits,
-            //                 views: views
-            //             });
-            //         }
-            //         return chartData;
-            //     }
-
-            //     function getRandomColor() {
-            //         var letters = '0123456789ABCDEF';
-            //         var color = '#';
-            //         for (var i = 0; i < 6; i++) {
-            //             color += letters[Math.floor(Math.random() * 16)];
-            //         }
-            //         return color;
-            //     }
-
-            //     function random_rgba() {
-            //         var o = Math.round,
-            //             r = Math.random,
-            //             s = 255;
-            //         return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
-            //     }
-
-            // }); // end am4core.ready()
+                return Promise.resolve($table)
+            }
         </script>
     </div>
 </body>
