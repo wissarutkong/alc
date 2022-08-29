@@ -208,7 +208,7 @@ require_once '../authen.php';
                 function getCountAlldata() {
                     CallAPI('GET', '../../service/devicecustomer/counter.php', '').then((data) => {
                         let obj = data.response[0]
-                        console.log(obj);
+                        // console.log(obj);
                         $('#count_device_all').text(obj.count)
                     }).catch((error) => {
                         toastr.error(error.status)

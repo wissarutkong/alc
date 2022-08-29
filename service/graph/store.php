@@ -12,8 +12,34 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         $datetime_from = $_GET['datetime_from'];
         $datetime_to = $_GET['datetime_to'];
 
+        $parameters = $_GET['parameters'];
+        $arr_params = array();
+
+        $arr_params = explode(',', $parameters);
+        $parameters = '';
+        $counter = 0;
+        foreach ($arr_params as $key => $value) {
+            $parameters .= "if(SIGN(".$value.")<>-1,".$value.",0) as ".$value."";
+            if(++$counter == count( $arr_params )) {
+                $parameters .= '';
+            }else{
+                $parameters .= ',';
+            }
+        }
+
+        $sql = "SELECT
+        r.datetime as date , $parameters
+    FROM
+        realtime_data_1 r INNER JOIN devicelist d ON d.device_id = r.id_name
+    WHERE
+        d.id = '" . $id_name . "'
+    AND r.datetime BETWEEN '" . $datetime_from . "'
+    AND '" . $datetime_to . "' 
+    ORDER BY
+        datetime ASC";
+
         $stmt = $conn->prepare("SELECT
-        r.datetime as date , if(SIGN(p_out)<>-1,p_out,0) as p_out  , flowrate  , CSQ , VBATT , SolarVoltage
+        r.datetime as date , $parameters
     FROM
         realtime_data_1 r INNER JOIN devicelist d ON d.device_id = r.id_name
     WHERE

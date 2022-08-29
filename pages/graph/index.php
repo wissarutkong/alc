@@ -15,6 +15,9 @@ require_once '../authen.php';
     <script src="../../assets/plugins/amcharts_4/themes/animated.js"></script>
     <!-- <script src="../../assets/plugins/amcharts_4/lang/de_DE.js"></script> -->
     <!-- <script src="../../assets/plugins/amcharts_4/fonts/notosans-sc.js"></script> -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
     <style>
         #chartdiv {
             width: 100%;
@@ -95,6 +98,11 @@ require_once '../authen.php';
                                                                             </select>
                                                                         </div>
                                                                     <?php } ?>
+                                                                    <div class="form-group col-md-8 col-sm-12">
+                                                                        <label for="select_ddl_parameter">ข้อมูล (parameters)</label>
+                                                                        <select id="select_ddl_parameter" name="select_ddl_parameter" multiple class="form-control" style="width: 100%;" required>
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="col-lg-5">
@@ -191,7 +199,7 @@ require_once '../authen.php';
                                             </div>
 
                                         </div>
-                                        <div class="tab-pane fade show active" id="tab_table_data" role="tabpanel" aria-labelledby="tab_table_data_id">
+                                        <div class="tab-pane fade show" id="tab_table_data" role="tabpanel" aria-labelledby="tab_table_data_id">
                                             <div class="overlay-wrapper">
 
                                                 <div id="loading" style="display: none;" class="overlay"><i class="fas fa-3x fa-sync-alt fa-spin"></i>
@@ -316,6 +324,13 @@ require_once '../authen.php';
                     })
                 }
 
+                getddl("select_ddl_parameter", "graph").then(() => {
+                    var multipleCancelButton = new Choices('#select_ddl_parameter', {
+                        removeItemButton: true
+                    });
+                })
+
+
                 // $('button[name=search_btn]').click(function() {
                 //     console.log(startDate.format('YYYY-MM-DD HH:mm:ss'));
                 // })
@@ -336,7 +351,7 @@ require_once '../authen.php';
                     e.preventDefault()
                     document.getElementById('loading').style.display = 'flex'
 
-                    var formData = $('#formGraphsearch').serialize() + '&datetime_from=' + datetime_from + '&datetime_to=' + datetime_to
+                    var formData = $('#formGraphsearch').serialize() + '&datetime_from=' + datetime_from + '&datetime_to=' + datetime_to + '&parameters=' + $('#select_ddl_parameter').val()
 
                     CallAPI('GET', '../../service/graph/store.php',
                         formData
@@ -345,8 +360,6 @@ require_once '../authen.php';
 
                         chartDataGraph = data.response.chartdata[0]
                         chartColumn = data.response.columndata[0]
-
-                        // console.log(chartDataGraph);
 
                         var my_columns = [];
 
@@ -357,16 +370,6 @@ require_once '../authen.php';
                             my_item.className = 'align-middle';
                             my_columns.push(my_item);
                         });
-
-                        // console.log(my_columns);
-
-
-                        // console.log(chartColumn);
-
-                        // chartColumn.forEach(function(item, index) {
-                        //     console.log(index);
-                        //     console.log(item);
-                        // })
 
                         generategraph(chartDataGraph, chartColumn)
 
@@ -410,7 +413,7 @@ require_once '../authen.php';
                 dateAxis.dateFormats.setKey("week", "d MMM");
                 dateAxis.periodChangeDateFormats.setKey("week", "d MMM");
 
-                const color_dict = ["#a367dc", "#67b7dc", "#daa520", "#dc67ce", "#339933", "#993300", "#003399", "#660066", "#0e2f44", "#ff9900", "#f6546a", "#b4eeb4", "#008000", "#00ced1", "#468499", "#ff7f50", "#333333", "#666633", "#6897bb", "#20b2aa", "#c39797", "#ffff00", "#008080", "#133337"]
+                const color_dict = ["#6610f2", "#28A745","#FFC107","#ff851b","#007bff","#1988C8","#9C427B","#DE2119","#009442","#0000FE","#CFE92B","#A6194B"]
 
                 // Create series
                 function createAxisAndSeries(field, name, opposite) {
@@ -419,21 +422,27 @@ require_once '../authen.php';
                         valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
                     }
 
-                    // var color = color_dict[Math.floor(Math.random()*color_dict.length)];
-                    var color_random = getRandomColor();
+                    valueAxis.events.on("ready", function(ev) {
+                        ev.target.min = ev.target.min;
+                        ev.target.max = ev.target.max;
+                    })
+
+                    var color = color_dict[Math.floor(Math.random()*color_dict.length)];
+                    // var color_random = getRandomColor();
 
                     var series = chart.series.push(new am4charts.LineSeries());
                     series.dataFields.valueY = field;
                     series.dataFields.dateX = "date";
                     series.strokeWidth = 1.8;
                     series.yAxis = valueAxis;
-                    series.fill = am4core.color(color_random);
-                    series.stroke = am4core.color(color_random);
+                    series.fill = am4core.color(color);
+                    series.stroke = am4core.color(color);
                     series.name = name;
                     series.tooltipText = "{name}: [bold]{valueY}[/]";
                     // series.tensionX = 0.85;
                     series.showOnInit = true;
 
+                    valueAxis.renderer.baseGrid.disabled = true;
                     valueAxis.renderer.line.strokeOpacity = 0.3;
                     valueAxis.renderer.line.strokeWidth = 0.5;
                     valueAxis.renderer.line.stroke = series.stroke;
@@ -451,53 +460,12 @@ require_once '../authen.php';
                     }
                 })
 
-                // console.log(chartDataGraph);
-                // console.log(generateChartData());
-
-                // createAxisAndSeries("visits", "Pressure", false);
-                // createAxisAndSeries("views", "Flow", true);
-                // createAxisAndSeries("hits", "CSQ", true);
-
                 // Add legend
                 chart.legend = new am4charts.Legend();
 
                 // Add cursor
                 chart.cursor = new am4charts.XYCursor();
                 chart.scrollbarX = new am4core.Scrollbar();
-
-                // generate some random data, quite different range
-                function generateChartData() {
-                    var chartData = [];
-                    var firstDate = new Date();
-                    firstDate.setDate(firstDate.getDate() - 100);
-                    firstDate.setHours(0, 0, 0, 0);
-
-                    var visits = 1600;
-                    var hits = 2900;
-                    var views = 8700;
-
-                    for (var i = 0; i < 60; i++) {
-                        // we create date objects here. In your data, you can have date strings
-                        // and then set format of your dates using chart.dataDateFormat property,
-                        // however when possible, use date objects, as this will speed up chart rendering.
-                        var newDate = new Date(firstDate);
-                        newDate.setDate(newDate.getDate() + i);
-
-                        visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-                        hits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-                        views += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-
-                        chartData.push({
-                            date: newDate,
-                            visits: visits,
-                            hits: hits,
-                            views: views
-                        });
-                    }
-
-                    console.log(chartData);
-                    return chartData;
-                }
 
                 function getRandomColor() {
                     var letters = '0123456789ABCDEF';
