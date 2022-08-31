@@ -358,6 +358,7 @@ require_once '../authen.php';
                     ).then((data) => {
                         document.getElementById('loading').style.display = 'none'
 
+                        let chartDataGraph = []
                         chartDataGraph = data.response.chartdata[0]
                         chartColumn = data.response.columndata[0]
 

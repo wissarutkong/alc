@@ -1,4 +1,6 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Headers: *");
 
 require_once 'service/db/cons.php';
 require("service/phpMQTT.php");
@@ -18,7 +20,10 @@ $VBATT = floatval($buffgsm[10]);                                // BatteryVoltag
 $SolarVoltage = floatval($buffgsm[11]);                        // SolarVoltage
 $io3 = floatval($buffgsm[12]);                                        //Temp on board
 
-
+echo "@>None#";
+echo ",";
+echo "$dt";
+echo "#";
 
 try {
     $conmand = $conn->prepare("INSERT INTO realtime_data_1 (id_name,datetime,dtd,p_out,p_in,flowrate,flowtotal,CSQ,VBATT,SolarVoltage,temperature) 
@@ -50,12 +55,12 @@ try {
 
     publish_mqtt($topic, $message);
 
-    $response = [
-        'status' => true,
-        'message' => 'success'
-    ];
+    // $response = [
+    //     'status' => true,
+    //     'message' => 'success'
+    // ];
     http_response_code(200);
-    echo json_encode($response);
+    // echo json_encode($response);
 } catch (Exception $e) {
     echo json_encode($e->getMessage());
 }
