@@ -49,7 +49,7 @@ try {
         'id' => $id_name,
         'p_out' => $Ai1,
         'p_in' => $Ai2,
-        'flow' => $io5_counter,
+        'flow' => number_format($io5_counter, 2),
         'datetime' => $dtd_now
     );
 
