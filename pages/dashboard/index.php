@@ -58,8 +58,9 @@ include_once '../authen.php';
                         <thead>
                           <tr class="table-primary">
                             <th>จุดติดตั้ง</th>
-                            <th class="text-center">P out</th>
-                            <th class="text-center">Flow</th>
+                            <th class="text-center">P out <br><h6 style="color: #A8A8A8">Bar</h6></th>
+                            <th class="text-center">Flow <br><h6 style="color: #A8A8A8">m³/hr</h6></th>
+                            <th class="text-center">Flow Total <br><h6 style="color: #A8A8A8">m³</h6></th>
                             <th class="text-center">วันเวลาอัพเดต</th>
                           </tr>
                         </thead>
@@ -161,6 +162,7 @@ include_once '../authen.php';
                   html_table += "<td data-toggle='tooltip' data-placement='top' title='" + data_temp.device_id + "'>" + data_temp.device_desc + "</td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-p_out'></span></td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flow'></span></td>"
+                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flowtotal'></span></td>"
                   html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-datetime'></span></td>"
                   html_table += "</tr>"
                   device_topic.push(data_temp.device_id)
@@ -250,6 +252,7 @@ include_once '../authen.php';
 
           $('.' + message_mqtt.id + '-p_out').text(String(message_mqtt.p_out))
           $('.' + message_mqtt.id + '-flow').text(String(message_mqtt.flow))
+          $('.' + message_mqtt.id + '-flowtotal').text(String(message_mqtt.flowtotal))
           $('.' + message_mqtt.id + '-datetime').text(String(message_mqtt.datetime))
         }
 

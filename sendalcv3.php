@@ -59,6 +59,7 @@ try {
         'p_out' => $Ai1,
         'p_in' => $Ai2,
         'flow' => number_format($io5_counter, 2),
+        'flowtotal' => number_format($io5_acc, 2),
         'datetime' => $dtd
     );
 
