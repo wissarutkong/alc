@@ -134,7 +134,9 @@ include_once '../authen.php';
       $(function() {
 
         var topic
+        let company_id_temp
         let permissions = <?php echo $_SESSION['AD_PERMISSION']; ?>
+
 
 
         if (permissions == 1) {
@@ -151,6 +153,7 @@ include_once '../authen.php';
 
         function getDatatable(company_id) {
           hidePage()
+          company_id_temp = company_id
           CallAPI('GET', '../../service/dashboard/store.php', {
             company_id: company_id
           }).then((data) => {
@@ -211,6 +214,14 @@ include_once '../authen.php';
           })
         }
 
+        function initaldata_dashboard() {
+          CallAPI('GET', '../../service/dashboard/initaldata_dashboard.php', {
+            company_id: company_id_temp
+          }).then((data) => {}).catch((error) => {
+            console.log(error);
+          })
+        }
+
 
 
         function inialize(device_topic) {
@@ -244,6 +255,7 @@ include_once '../authen.php';
           $.each(topic, function(index, value) {
             client.subscribe("relogger/" + value + "");
           })
+          initaldata_dashboard()
         }
 
         function onConnectionLost(responseObject) {

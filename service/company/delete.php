@@ -1,49 +1,54 @@
-<?php 
+<?php
 
 header('Content-Type: application/json');
 require_once '../db/cons.php';
 include_once '../authen.php';
 include_once '../permission.php';
 
-if($_SERVER['REQUEST_METHOD'] === "POST"){
-try{
-    $data = $_POST['id'];
+if ($_SERVER['REQUEST_METHOD'] === "POST") {
+    try {
+        $data = $_POST['id'];
 
-    $stmt = $conn->prepare("SELECT * FROM users u INNER JOIN company c on c.id = u.company WHERE c.id = :id ") ;
-    $stmt->execute([
-        "id" => (int)$data
-    ]);
-    $number_of_rows = $stmt->fetchColumn();
-
-    if($number_of_rows > 0){
-        http_response_code(404);
-        echo json_encode(array('status' => false, 'message' => 'ลบไม่สำเร็จ! มีผู้ใช้งานผูกอยู่ในบริษัทนี้'));
-    }else{
-        $conmand = $conn->prepare("DELETE FROM company WHERE id = :id") ;
-
-        $conmand->execute([
+        $stmt = $conn->prepare("SELECT * FROM users u INNER JOIN company c on c.id = u.company WHERE c.id = :id ");
+        $stmt->execute([
             "id" => (int)$data
         ]);
-    
-        $response = [
-            'status' => true,
-            'message' => 'Delete company success'
-        ];
-        http_response_code(200);
-        echo json_encode($response);
+        $number_of_rows = $stmt->fetchColumn();
+
+        if ($number_of_rows > 0) {
+            http_response_code(404);
+            echo json_encode(array('status' => false, 'message' => 'ลบไม่สำเร็จ! มีผู้ใช้งานผูกอยู่ในบริษัทนี้'));
+        } else {
+
+            $stmt = $conn->prepare("SELECT * FROM devicelist d INNER JOIN company c ON d.company_id = c.id WHERE c.id = :id ");
+            $stmt->execute([
+                "id" => (int)$data
+            ]);
+            $number_of_rows_device = $stmt->fetchColumn();
+            if ($number_of_rows_device > 0) {
+                http_response_code(404);
+                echo json_encode(array('status' => false, 'message' => 'ลบไม่สำเร็จ! มีอุปกรณ์ผูกอยู่ในบริษัทนี้'));
+            } else {
+                $conmand = $conn->prepare("DELETE FROM company WHERE id = :id");
+
+                $conmand->execute([
+                    "id" => (int)$data
+                ]);
+
+                $response = [
+                    'status' => true,
+                    'message' => 'Delete company success'
+                ];
+                http_response_code(200);
+                echo json_encode($response);
+            }
+        }
+    } catch (PDOException $exception) {
+        echo json_encode($exception->getMessage());
+        http_response_code(404);
+        exit();
     }
-
-
-
-
-}catch(PDOException $exception){
-    echo json_encode( $exception->getMessage());
-    http_response_code(404);
-    exit();
-}
-}else{
+} else {
     http_response_code(405);
     echo json_encode(array('status' => false, 'message' => 'Medthod not Allowed!!'));
 }
-
-?>

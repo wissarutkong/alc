@@ -27,21 +27,21 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
             }
         }
 
-        $sql = "SELECT
-        r.datetime as date , $parameters
-    FROM
-        realtime_data_1 r INNER JOIN devicelist d ON d.device_id = r.id_name
-    WHERE
-        d.id = '" . $id_name . "'
-    AND r.datetime BETWEEN '" . $datetime_from . "'
-    AND '" . $datetime_to . "' 
-    ORDER BY
-        datetime ASC";
+    //     $sql = "SELECT
+    //     r.datetime as date , $parameters
+    // FROM
+    //     data_1min r INNER JOIN devicelist d ON d.device_id = r.id_name
+    // WHERE
+    //     d.id = '" . $id_name . "'
+    // AND r.datetime BETWEEN '" . $datetime_from . "'
+    // AND '" . $datetime_to . "' 
+    // ORDER BY
+    //     datetime ASC";
 
         $stmt = $conn->prepare("SELECT
         r.datetime as date , $parameters
     FROM
-        realtime_data_1 r INNER JOIN devicelist d ON d.device_id = r.id_name
+        data_1min r INNER JOIN devicelist d ON d.device_id = r.id_name
     WHERE
         d.id = '" . $id_name . "'
     AND r.datetime BETWEEN '" . $datetime_from . "'
