@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
                 $topic = 'relogger/' . $val['id_name'];
                 $message = array(
                     'id' => $val['id_name'],
-                    'p_out' => $val['p_out'],
-                    'p_in' => $val['p_in'],
+                    'p_out' => number_format($val['p_out'],2),
+                    'p_in' => number_format($val['p_in'],2),
                     'flow' => number_format($val['flowrate'], 2),
                     'flowtotal' => number_format($val['flowtotal'], 2),
                     'datetime' => $val['datetime']
