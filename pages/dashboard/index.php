@@ -7,6 +7,11 @@ include_once '../authen.php';
 
 <head>
   <?php include '../layout/header.php'; ?>
+  <style type="text/css">
+    .table thead th {
+      vertical-align: inherit;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini sidebar-collapse">
@@ -58,9 +63,15 @@ include_once '../authen.php';
                         <thead>
                           <tr class="table-primary">
                             <th>จุดติดตั้ง</th>
-                            <th class="text-center">P out <br><h6 style="color: #A8A8A8">Bar</h6></th>
-                            <th class="text-center">Flow <br><h6 style="color: #A8A8A8">m³/hr</h6></th>
-                            <th class="text-center">Flow Total <br><h6 style="color: #A8A8A8">m³</h6></th>
+                            <th class="text-center">P out <br>
+                              <h6 style="color: #A8A8A8">Bar</h6>
+                            </th>
+                            <th class="text-center">Flow <br>
+                              <h6 style="color: #A8A8A8">m³/hr</h6>
+                            </th>
+                            <th class="text-center">Flow Total <br>
+                              <h6 style="color: #A8A8A8">m³</h6>
+                            </th>
                             <th class="text-center">วันเวลาอัพเดต</th>
                           </tr>
                         </thead>
@@ -245,9 +256,14 @@ include_once '../authen.php';
           // console.log("onMessageArrived:" + message.payloadString);
           var message_mqtt = JSON.parse(message.payloadString)
 
-          if (message_mqtt.flow === undefined || message_mqtt.p_out === undefined) {
+          if (message_mqtt.flow === undefined) {
             message_mqtt.flow = "-"
+          }
+          if (message_mqtt.p_out === undefined) {
             message_mqtt.p_out = "-"
+          }
+          if (message_mqtt.flowtotal === undefined) {
+            message_mqtt.flowtotal = "-"
           }
 
           $('.' + message_mqtt.id + '-p_out').text(String(message_mqtt.p_out))

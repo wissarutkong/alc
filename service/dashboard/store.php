@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
             $company_id = $_SESSION['AD_COMPANY'];
         }
 
-        $stmt = $conn->prepare("SELECT s.id, s.site_desc FROM
+        $stmt = $conn->prepare("SELECT  s.id, s.site_desc FROM
 devicelist d
 INNER JOIN site s ON d.site_id = s.id
 WHERE

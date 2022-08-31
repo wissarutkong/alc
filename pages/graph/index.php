@@ -396,6 +396,9 @@ require_once '../authen.php';
                 chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm:ss";
                 // Increase contrast by taking evey second color
                 chart.colors.step = 2;
+
+                // chart.background.fill = '#0f0'
+                chart.background.opacity = 0.5;
                 // Add data
                 chart.data = chartDataGraph;
 
@@ -414,19 +417,20 @@ require_once '../authen.php';
                 dateAxis.dateFormats.setKey("week", "d MMM");
                 dateAxis.periodChangeDateFormats.setKey("week", "d MMM");
 
-                const color_dict = ["#6610f2", "#28A745","#FFC107","#ff851b","#007bff","#1988C8","#9C427B","#DE2119","#009442","#0000FE","#CFE92B","#A6194B"]
+                const color_dict = ["#6610f2", "#28A745","#FFC107","#ff851b","#007bff","#1988C8","#9C427B","#DE2119","#009442","#0000FE","#CFE92B","#A6194B","#0f0"]
 
                 // Create series
                 function createAxisAndSeries(field, name, opposite) {
                     var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                    valueAxis.min = 0;
                     if (chart.yAxes.indexOf(valueAxis) != 0) {
                         valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
                     }
 
-                    valueAxis.events.on("ready", function(ev) {
-                        ev.target.min = ev.target.min;
-                        ev.target.max = ev.target.max;
-                    })
+                    // valueAxis.events.on("ready", function(ev) {
+                    //     ev.target.min = ev.target.min;
+                    //     ev.target.max = ev.target.max;
+                    // })
 
                     var color = color_dict[Math.floor(Math.random()*color_dict.length)];
                     // var color_random = getRandomColor();
@@ -443,8 +447,8 @@ require_once '../authen.php';
                     // series.tensionX = 0.85;
                     series.showOnInit = true;
 
-                    valueAxis.renderer.baseGrid.disabled = true;
-                    valueAxis.renderer.line.strokeOpacity = 0.3;
+                    valueAxis.renderer.baseGrid.disabled = false;
+                    valueAxis.renderer.line.strokeOpacity = 0.7;
                     valueAxis.renderer.line.strokeWidth = 0.5;
                     valueAxis.renderer.line.stroke = series.stroke;
                     valueAxis.renderer.labels.template.fill = am4core.color("#000000");
