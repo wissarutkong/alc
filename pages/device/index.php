@@ -7,6 +7,10 @@ require_once '../permission.php';
 
 <head>
     <?php include '../layout/header.php'; ?>
+    <!-- InputMask -->
+    <script src="../../assets/plugins/moment/moment.min.js"></script>
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="../../assets/plugins/daterangepicker/daterangepicker.css">
 </head>
 
 <body class="hold-transition sidebar-mini sidebar-collapse">
@@ -252,11 +256,54 @@ require_once '../permission.php';
                     <!-- /.modal-dialog -->
                 </div>
                 <!-- /.modal -->
+
+
+                <div class="modal fade" id="del_date_modal">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">ลบข้อมูล Raw Data</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="formDelRawdata">
+                                    <div class="row">
+
+                                        <!-- Date and time range -->
+                                        <div class="form-group col-md-8 col-xs-12">
+                                            <label>เลือกช่วงเวลาที่ต้องการลบ</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-clock"></i></span>
+                                                </div>
+                                                <input type="text" autocapitalize="off" autocomplete="off" autocorrect="off" class="form-control float-right" id="del_daterange" name="del_daterange" required>
+                                            </div>
+                                            <!-- /.input group -->
+                                        </div>
+                                        <!-- /.form group -->
+                                        <button type="submit" name="btn_deleterawdata" class="btn btn-danger btn-lg col-md-2 col-xs-12" height="100%"><i class="far fa-trash-alt"></i> ลบข้อมูล</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">ปิด</button>
+                            </div>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
+
             </section>
             <!-- /.content -->
             <input type="hidden" id="devices_id" name="devices_id" value="">
         </div>
         <?php include '../layout/footer.php'; ?>
+        <!-- date-range-picker -->
+        <script src="../../assets/plugins/daterangepicker/daterangepicker.js"></script>
 
         <script type="text/javascript">
             $(function() {
@@ -497,7 +544,13 @@ require_once '../permission.php';
                                 <button type="button" class="btn btn-danger btndelete" data-id="${item.id}" data-index="${index}">
                                     <i class="far fa-trash-alt"></i> ลบ
                                 </button>
-                            </div>`
+                            </div>
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                ...
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item open-modal-delrawdata" href="#" data-toggle="modal" data-id="${item.id}">ลบข้อมูล Raw data</a>
+                                </div>`
                             ])
                         })
 
@@ -634,6 +687,87 @@ require_once '../permission.php';
 
                 //#endregion
 
+                //#region delete raw data =========================================
+
+                var startDate;
+                var endDate;
+                $(document).on("click", ".open-modal-delrawdata", function() {
+                    var deviceId = $(this).data('id');
+                    $('#devices_id').val('');
+                    $('#del_date_modal').modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                        show: true
+                    });
+                    if (deviceId != "") {
+                        $('#devices_id').val(deviceId);
+                    } else {
+                        toastr.error("พบข้อผิดพลาดกรุณาลองใหม่อีกครั้ง")
+                    }
+                })
+
+                $('#del_daterange').daterangepicker({
+                        // startDate: moment().subtract('days', 2),
+                        // endDate: moment(),
+                        autoUpdateInput: false,
+                        timePicker: true,
+                        timePicker24Hour: true,
+                        timePickerIncrement: 1,
+                        timePickerSeconds: true,
+                        applyClass: 'btn-small btn-success',
+                        cancelClass: 'btn-small',
+                        showDropdowns: false,
+                        locale: {
+                            applyLabel: 'เลือก',
+                            cancelLabel: 'ยกเลิก',
+                            fromLabel: 'จาก',
+                            toLabel: 'ถึง',
+                            customRangeLabel: 'Custom Range',
+                            daysOfWeek: ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ', 'ศ.', 'ส.'],
+                            monthNames: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'],
+                            firstDay: 1,
+                            format: 'DD/MM/YYYY H:mm'
+                        }
+                    },
+                    function(start, end, label) {
+                        // console.log("Callback has been called!");
+                        // console.log(start.format('YYYY-MM-DD HH:mm:ss') + ' - ' + end.format('YYYY-MM-DD HH:mm:ss'));
+                        startDate = start;
+                        endDate = end;
+                    })
+
+                let datetime_from
+                let datetime_to
+
+                $('#del_daterange').on('apply.daterangepicker', function(ev, picker) {
+                    $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm:ss') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm:ss'));
+                    datetime_from = picker.startDate.format('YYYY-MM-DD HH:mm:ss')
+                    datetime_to = picker.endDate.format('YYYY-MM-DD HH:mm:ss')
+                });
+
+                $('#formDelRawdata').on('submit', function(e) {
+                    e.preventDefault()
+                    $devices_id = $('#devices_id').val()
+                    if ($devices_id != "") {
+                        var formData = $('#formDelRawdata').serialize() + '&datetime_from=' + datetime_from + '&datetime_to=' + datetime_to + '&id=' + $devices_id
+                        CallAPI('POST', '../../service/device/deleterawdata.php',
+                            formData
+                        ).then((data) => {
+                            toastr.success(data.message)
+                            $('#del_date_modal').modal('hide');
+                        }).catch((error) => {
+                            toastr.error(error.status)
+                        })
+                    } else {
+                        toastr.error("พบข้อผิดพลาดกรุณาลองใหม่อีกครั้ง")
+                    }
+                });
+
+
+
+                //#endregion
+
+
                 $(document).on("click", ".open-modal-site", function() {
                     var deviceId = $(this).data('id');
                     $('#devices_id').val('');
@@ -709,7 +843,7 @@ require_once '../permission.php';
                     e.preventDefault()
                     $devices_id = $('#devices_id').val()
                     var formData = $('#formDatasiteedit').serialize() + '&id=' + $devices_id
-                    CallAPI('POST','../../service/device/updatesite.php',
+                    CallAPI('POST', '../../service/device/updatesite.php',
                         formData
                     ).then((data) => {
                         toastr.success(data.message)

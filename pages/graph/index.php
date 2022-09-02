@@ -261,8 +261,6 @@ require_once '../authen.php';
         <?php include '../layout/footer.php'; ?>
         <!-- date-range-picker -->
         <script src="../../assets/plugins/daterangepicker/daterangepicker.js"></script>
-        <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-        <script src="../../assets/js/pages/dashboard3.js"></script>
 
         <script type="text/javascript">
             var startDate;
