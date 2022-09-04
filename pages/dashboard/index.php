@@ -255,7 +255,7 @@ include_once '../authen.php';
           $.each(topic, function(index, value) {
             client.subscribe("relogger/" + value + "");
           })
-          initaldata_dashboard()
+          // initaldata_dashboard()
         }
 
         function onConnectionLost(responseObject) {

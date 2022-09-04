@@ -106,6 +106,15 @@
               </p>
             </a>
           </li>
+          <!-- <li class="nav-header">รายงาน</li>
+          <li class="nav-item">
+            <a href="../WaterFlowThroughMeterreport/" class="nav-link">
+              <i class="nav-icon fas fa-cogs"></i>
+              <p>
+                การจ่ายน้ำผ่านมาตร 1 วัน/ชม.
+              </p>
+            </a>
+          </li> -->
           <?php if($_SESSION['AD_PERMISSION'] == 1){  ?>
             <li class="nav-header">ตั้งค่าสำหรับ Admin</li>
             <li class="nav-item">
