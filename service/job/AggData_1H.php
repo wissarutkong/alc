@@ -40,8 +40,12 @@ class Database
 $Database = new Database();
 $conn = $Database->connect();
 
+if (!empty($_GET['datetime'])) {
+    $dtd_now = $_GET['datetime'];
+} else {
+    $dtd_now = date("Y-m-d H:i:s");
+}
 
-$dtd_now = date("Y-m-d H:i:s");
 $dtd_rev = date("Y-m-d H:i:s", strtotime($dtd_now . '-1 hour'));
 $date = new DateTime($dtd_rev);
 $date->setTime($date->format('G'), 0); // Current hour, 0 minute, [0 second]
@@ -63,8 +67,8 @@ try {
 
         $stmt = $conn->prepare("SELECT
     AVG(DISTINCT flowrate) as flowrate_avg , AVG(DISTINCT p_out) as p_out_avg , AVG(DISTINCT flowtotal) as flowtotal_avg ,
-    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MIN(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_min,
-    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MAX(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_max
+    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MIN(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),NULL) AS flowtotal_min,
+    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MAX(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),NULL) AS flowtotal_max
     FROM
     data_1min
     WHERE
@@ -84,22 +88,32 @@ try {
         // echo json_encode([$p_pressure_avg,$p_flow_avg,$res_2->flowtotal_max, $res_2->flowtotal_min,$p_volume_sum]);
 
         $conmand = $conn->prepare("INSERT INTO data_60 (id_name,datetime,p_pressure_avg,p_flow_avg,p_flowacc_sum,p_volume_sum) VALUES (
-            :id_name , :datetime , :p_pressure_avg , :p_flow_avg , :p_flowacc_sum , :p_volume_sum
-        )");
+                :id_name , :datetime , :p_pressure_avg , :p_flow_avg , :p_flowacc_sum , :p_volume_sum
+            )");
 
-        $conmand->execute([
+
+        if ($conmand->execute([
             "id_name" => (string)$row['device_id'],
             "datetime" => $datetime_stamp,
             "p_pressure_avg" => $p_pressure_avg,
             "p_flow_avg" => $p_flow_avg,
             "p_flowacc_sum" => $p_flowacc_sum,
             "p_volume_sum" => $p_volume_sum
-        ]);
+        ])) {
+            // success
+            $conmand = $conn->prepare("UPDATE data_1min SET flag_agg = 1 WHERE id_name = :id_name AND dtd BETWEEN '" . $datetime_from . "'AND '" . $datetime_to . "' ");
+            $conmand->execute([
+                "id_name" => (string)$row['device_id']
+            ]);
+        } else {
+            echo json_encode($exception->getMessage());
+            http_response_code(404);
+            exit();
+        }
     }
-
     $response = [
         'status' => true,
-        'message' => 'Agg 1 hour complete'
+        'message' => 'Agg 1 hour complete',
     ];
     http_response_code(200);
     echo json_encode($response);
