@@ -1,5 +1,5 @@
 <?php
-require_once '../db/cons.php';
+require_once __DIR__ .'../db/cons.php';
 
 
 $dtd_now = date("Y-m-d H:i:s");
