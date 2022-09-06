@@ -69,8 +69,8 @@ try {
 
         $stmt = $conn->prepare("SELECT
     AVG(DISTINCT flowrate) as flowrate_avg , AVG(DISTINCT p_out) as p_out_avg , AVG(DISTINCT flowtotal) as flowtotal_avg ,
-    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) > 5  ,MIN(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_min,
-    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) > 5  ,MAX(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_max
+    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MIN(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_min,
+    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MAX(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_max
     FROM
     data_1min
     WHERE id_name = :id_name
