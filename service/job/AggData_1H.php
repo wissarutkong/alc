@@ -46,6 +46,8 @@ if (!empty($_GET['datetime'])) {
     $dtd_now = date("Y-m-d H:i:s");
 }
 
+$status_msg = '';
+
 $dtd_rev = date("Y-m-d H:i:s", strtotime($dtd_now . '-1 hour'));
 $date = new DateTime($dtd_rev);
 $date->setTime($date->format('G'), 0); // Current hour, 0 minute, [0 second]
@@ -67,13 +69,11 @@ try {
 
         $stmt = $conn->prepare("SELECT
     AVG(DISTINCT flowrate) as flowrate_avg , AVG(DISTINCT p_out) as p_out_avg , AVG(DISTINCT flowtotal) as flowtotal_avg ,
-    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MIN(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),NULL) AS flowtotal_min,
-    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) < 5  ,MAX(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),NULL) AS flowtotal_max
+    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) > 5  ,MIN(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_min,
+    IF(SUM(CASE WHEN flowtotal IS NULL THEN 1 ELSE 0 END) > 5  ,MAX(CASE WHEN flowtotal IS NOT NULL THEN flowtotal END),0) AS flowtotal_max
     FROM
     data_1min
-    WHERE
-    flag_agg = 0
-    AND id_name = :id_name
+    WHERE id_name = :id_name
     AND dtd BETWEEN '" . $datetime_from . "'
     AND '" . $datetime_to . "' ");
         $stmt->execute([
@@ -87,33 +87,57 @@ try {
         $p_volume_sum = $res_2->flowtotal_max - $res_2->flowtotal_min;
         // echo json_encode([$p_pressure_avg,$p_flow_avg,$res_2->flowtotal_max, $res_2->flowtotal_min,$p_volume_sum]);
 
-        $conmand = $conn->prepare("INSERT INTO data_60 (id_name,datetime,p_pressure_avg,p_flow_avg,p_flowacc_sum,p_volume_sum) VALUES (
+
+        $stmt = $conn->prepare("SELECT * FROM data_60 WHERE id_name = :id_name AND datetime = :datetime_stamp ");
+        $stmt->execute([
+            "id_name" => (string)$row['device_id'],
+            "datetime_stamp" => $datetime_stamp
+        ]);
+        $res_3  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // echo json_encode([$res_3[0]['dl_id']]);
+
+        if (count($res_3) > 0) {
+
+            $conmand = $conn->prepare("UPDATE data_60 SET p_pressure_avg = :p_pressure_avg 
+            , p_flow_avg = :p_flow_avg , p_flowacc_sum = :p_flowacc_sum , p_volume_sum = :p_volume_sum WHERE dl_id = :dl_id  ");
+
+            $conmand->execute([
+                "dl_id" => (int)$res_3[0]['dl_id'],
+                "p_pressure_avg" => $p_pressure_avg,
+                "p_flow_avg" => $p_flow_avg,
+                "p_flowacc_sum" => $p_flowacc_sum,
+                "p_volume_sum" => $p_volume_sum
+            ]);
+
+            $status_msg = 'success';
+
+        } else {
+            $conmand = $conn->prepare("INSERT INTO data_60 (id_name,datetime,p_pressure_avg,p_flow_avg,p_flowacc_sum,p_volume_sum) VALUES (
                 :id_name , :datetime , :p_pressure_avg , :p_flow_avg , :p_flowacc_sum , :p_volume_sum
             )");
 
 
-        if ($conmand->execute([
-            "id_name" => (string)$row['device_id'],
-            "datetime" => $datetime_stamp,
-            "p_pressure_avg" => $p_pressure_avg,
-            "p_flow_avg" => $p_flow_avg,
-            "p_flowacc_sum" => $p_flowacc_sum,
-            "p_volume_sum" => $p_volume_sum
-        ])) {
-            // success
-            $conmand = $conn->prepare("UPDATE data_1min SET flag_agg = 1 WHERE id_name = :id_name AND dtd BETWEEN '" . $datetime_from . "'AND '" . $datetime_to . "' ");
-            $conmand->execute([
-                "id_name" => (string)$row['device_id']
-            ]);
-        } else {
-            echo json_encode($exception->getMessage());
-            http_response_code(404);
-            exit();
+            if ($conmand->execute([
+                "id_name" => (string)$row['device_id'],
+                "datetime" => $datetime_stamp,
+                "p_pressure_avg" => $p_pressure_avg,
+                "p_flow_avg" => $p_flow_avg,
+                "p_flowacc_sum" => $p_flowacc_sum,
+                "p_volume_sum" => $p_volume_sum
+            ])) {
+                // success
+                $status_msg = 'success';
+            } else {
+                echo json_encode($exception->getMessage());
+                http_response_code(404);
+                exit();
+            }
         }
     }
     $response = [
         'status' => true,
-        'message' => 'Agg 1 hour complete',
+        'message' => 'Agg 1 hour '.$status_msg
     ];
     http_response_code(200);
     echo json_encode($response);
