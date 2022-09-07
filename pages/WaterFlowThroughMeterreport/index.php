@@ -289,8 +289,7 @@ require_once '../authen.php';
                                 className: "align-middle"
                             },
                         ],
-                        initComplete: function() {
-                        },
+                        initComplete: function() {},
                         responsive: {
                             details: {
                                 display: $.fn.dataTable.Responsive.display.modal({
@@ -316,10 +315,32 @@ require_once '../authen.php';
                                 "next": "หน้าต่อไป"
                             }
                         },
+                        "footerCallback": function(tfoot, data, start, end, display) {
+                            var api = this.api();
+                            // converting to interger to find total
+                            var intVal = function(i) {
+                                return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                            };
+
+                            internationalNumberFormat = new Intl.NumberFormat('en-US')
+
+                            summary_flow_volumn = api
+                                .column(3)
+                                .data()
+                                .reduce(function(a, b) {
+                                    return intVal(a) + intVal(b);
+                                }, 0);
+
+                            $(api.column(3).footer()).html(internationalNumberFormat.format(summary_flow_volumn));
+                        }
                     })
 
                     return Promise.resolve($table)
                 }
+
+                $("#tables_search").append(
+                    $('<tfoot/>').append('<tr class="table-info"><th style="text-align:center;" colspan="3">สรุปปริมาณการจ่ายน้ำ (ลบ.ม.)</th><th></th><th></th><th></th></tr>'),
+                );
 
 
 
