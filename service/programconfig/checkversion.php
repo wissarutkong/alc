@@ -1,1 +1,1 @@
-<?php echo "4.0.0.5,- เพิ่ม Model Rs485 สามารถเลือก Other กรอกค่าเอง,- เพิ่ม Text Version ในหน้าโปรแกรม,- เพิ่ม Text สถานะเมื่อมีการ Upload,- เพิ่มเติมการแจ้งเตือน firmware version,- แก้ไขจุดบกพร่องของโปรแกรม,- เพิ่ม Openfile config";
+<?php echo "4.0.0.6,- เพิ่มมาตร SGM";
