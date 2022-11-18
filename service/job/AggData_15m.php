@@ -129,7 +129,7 @@ try {
 
             if ($conmand->execute([
                 "id_name" => (string)$row['device_id'],
-                "datetime" => $datetime_stamp,
+                "datetime" => $datetime_to,
                 "p_pressure_avg" => $p_pressure_avg,
                 "p_flow_avg" => $p_flow_avg,
                 "p_flowacc_sum" => $p_flowacc_sum,
