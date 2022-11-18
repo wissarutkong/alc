@@ -52,11 +52,11 @@ $status_msg = '';
 
 $min15InSecs = 15 * 60;
 // $min15 = time()-(time()%$min15InSecs)-$min15InSecs;
-$start  = new DateTime(date("Y-m-d H:i:00", time() - (time() % $min15InSecs) - $min15InSecs));
-$to  = new DateTime(date("Y-m-d H:i:00", time() - (time() % $min15InSecs)));
+$start  = new DateTime(date("Y-m-d H:i", time() - (time() % $min15InSecs) - $min15InSecs));
+$to  = new DateTime(date("Y-m-d H:i", time() - (time() % $min15InSecs)));
 
-$datetime_from = $start->format('Y-m-d H:i:s');
-$datetime_to = $to->format('Y-m-d H:i:s');
+$datetime_from = $start->format('Y-m-d H:i');
+$datetime_to = $to->format('Y-m-d H:i');
 
 // $dtd_rev = date("Y-m-d H:i", strtotime($dtd_now . '-15 minutes'));
 // $date = new DateTime($dtd_rev);
