@@ -217,7 +217,9 @@ include_once '../authen.php';
         function initaldata_dashboard() {
           CallAPI('GET', '../../service/dashboard/initaldata_dashboard.php', {
             company_id: company_id_temp
-          }).then((data) => {}).catch((error) => {
+          }).then((data) => {
+            console.log(data);
+          }).catch((error) => {
             console.log(error);
           })
         }
@@ -255,7 +257,7 @@ include_once '../authen.php';
           $.each(topic, function(index, value) {
             client.subscribe("relogger/" + value + "");
           })
-          initaldata_dashboard()
+          // initaldata_dashboard()
         }
 
         function onConnectionLost(responseObject) {

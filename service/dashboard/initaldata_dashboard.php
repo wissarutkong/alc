@@ -32,19 +32,28 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         $res  = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($res) > 0) {
-            foreach ($res as $key => $val) {
-                $topic = 'relogger/' . $val['id_name'];
-                $message = array(
-                    'id' => $val['id_name'],
-                    'p_out' => number_format($val['p_out'],2),
-                    'p_in' => number_format($val['p_in'],2),
-                    'flow' => number_format($val['flowrate'], 2),
-                    'flowtotal' => number_format($val['flowtotal'], 2),
-                    'datetime' => $val['datetime']
-                );
+            // foreach ($res as $key => $val) {
+            //     // $topic = 'relogger/' . $val['id_name'];
+            //     $message[$val['id_name']][] = array(
+            //         'id' => $val['id_name'],
+            //         'p_out' => number_format($val['p_out'], 2),
+            //         'p_in' => number_format($val['p_in'], 2),
+            //         'flow' => number_format($val['flowrate'], 2),
+            //         'flowtotal' => number_format($val['flowtotal'], 2),
+            //         'datetime' => $val['datetime']
+            //     );
 
-                publish_mqtt($topic, $message);
-            }
+            //     // publish_mqtt($topic, $message);
+            // }
+
+
+            $response = [
+                'status' => true,
+                'response' => $res,
+                'message' => 'Get Data Success'
+            ];
+            http_response_code(200);
+            echo json_encode($response);
         }
     } catch (Throwable $e) {
         http_response_code(404);
