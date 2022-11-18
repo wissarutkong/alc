@@ -202,6 +202,8 @@ include_once '../authen.php';
               storeKey: 'simple-tree-table-basic'
             });
 
+            // initaldata_dashboard()
+
             inialize(device_topic)
 
             showPage()
@@ -257,7 +259,7 @@ include_once '../authen.php';
           $.each(topic, function(index, value) {
             client.subscribe("relogger/" + value + "");
           })
-          // initaldata_dashboard()
+          
         }
 
         function onConnectionLost(responseObject) {

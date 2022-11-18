@@ -21,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         if ($agg_type == "15m") {
             $stmt = $conn->prepare("SELECT
             DATE(datetime) as date , TIME(datetime) as time , p_pressure_avg , p_flow_avg , p_flowacc_sum , p_volume_sum
-        FROM_15
+        FROM
+            data_15
         WHERE
-            data
             id_name = :id_name
         AND datetime BETWEEN '$date_search_from 08:00:00'
         AND '$date_search_to 08:00:00'
