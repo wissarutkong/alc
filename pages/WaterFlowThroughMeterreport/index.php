@@ -92,6 +92,13 @@ require_once '../authen.php';
                                                                         <label for="date_search">วันที่ค้นหา</label>
                                                                         <input type="text" class="form-control datetimepicker-input" id="date_search" name="date_search" data-toggle="datetimepicker" data-target="#date_search" required>
                                                                     </div>
+                                                                    <div class="form-group col-md-4 col-sm-12">
+                                                                        <label for="select_ddl_aggtype">ความถี่ข้อมูล</label>
+                                                                        <select id="select_ddl_aggtype" name="select_ddl_aggtype" class="form-control select2bs4" style="width: 100%;" required>
+                                                                            <option value="15m">15 นาที</option>
+                                                                            <option value="1H">1 ชั่วโมง</option>
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <button type="submit" name="search_btn" class="btn btn-info btn-lg btn-block col-lg-1" width="100%" height="100%"><i class="fas fa-search"></i> ค้นหา</button>
