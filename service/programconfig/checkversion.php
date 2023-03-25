@@ -1,1 +1,1 @@
-<?php echo "4.0.0.20,- เพื่อโหมด Control ใน STV3,- ปรับขนาดการแสดงผลใน STV3,- เพิ่มฟังก์ชั่น detect auto comport หน้า Home,- เพิ่ม Loading หน้า Home,- เพิ่ม Pressure PSI , BAR";
+<?php echo "4.0.0.21,- เพื่อโหมด Control ใน STV3,- ปรับขนาดการแสดงผลใน STV3,- เพิ่มฟังก์ชั่น detect auto comport หน้า Home,- เพิ่ม Loading หน้า Home,- เพิ่ม Pressure PSI BAR,- แก้ไขปุ่ม Reset Factory หายเอาไปไว้ข้างล่างขวามือ";
