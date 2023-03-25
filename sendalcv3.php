@@ -68,8 +68,8 @@ try {
 
 
     $response = array(
-        'success' => true,
-        'unixtime' => strtotime($dt)
+        "success" => true,
+        "unixtime" => '"'. strtotime($dt) . '"'
     );
     echo json_encode($response);
 
