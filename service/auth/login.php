@@ -5,7 +5,7 @@ require_once '../db/cons.php';
 
 
 if($_SERVER['REQUEST_METHOD'] === "POST"){
-    $stmt = $conn->prepare("SELECT * fROM users WHERE username = :username") ;
+    $stmt = $conn->prepare("SELECT * fROM users WHERE username = :username AND status_enable = '1'") ;
     $stmt->execute(array(":username" => $_POST['username']));
     $row = $stmt->fetch(PDO::FETCH_OBJ);
 
