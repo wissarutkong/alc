@@ -74,7 +74,8 @@
         }, 800)
       }).fail(function(resp) {
         window.toastr.remove()
-        toastr.error('ไม่สามารถเข้าสู่ระบบได้')
+        toastr.error('ไม่สามารถเข้าสู่ระบบได้กรุณาติดต่อบริษัท ST design')
+        // toastr.error('ไม่สามารถเข้าสู่ระบบได้')
       })
     })
   })
