@@ -9,10 +9,10 @@ if($_SERVER['REQUEST_METHOD'] === "POST"){
     $stmt->execute(array(":username" => $_POST['username']));
     $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-    if($_POST['username'] == 'waterconcept'){
-        http_response_code(500);
-        echo json_encode(array('status' => false, 'message' => 'Unauthorized!'));
-    }
+    // if($_POST['username'] == 'waterconcept'){
+    //     http_response_code(500);
+    //     echo json_encode(array('status' => false, 'message' => 'Unauthorized!'));
+    // }
 
 if ( !empty($row) && password_verify($_POST['password'], $row->password) ){
     $_SESSION['AD_ID'] = $row->id;
