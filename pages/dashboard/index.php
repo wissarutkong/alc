@@ -46,6 +46,7 @@ include_once '../authen.php';
 
       <div class="d-flex justify-content-center">
         <div id="loader" class="spinner-border text-primary" style="width: 8rem; height: 8rem;" role="status">
+          <span class="sr-only">กำลังโหลดข้อมูล...</span>
         </div>
       </div>
       <!-- Main content -->
@@ -174,10 +175,10 @@ include_once '../authen.php';
                   // console.log(data_temp);
                   html_table += "<tr data-node-id='" + data_temp.key + "' data-node-pid='" + key + "'>"
                   html_table += "<td data-toggle='tooltip' data-placement='top' title='" + data_temp.device_id + "'>" + data_temp.device_desc + "</td>"
-                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-p_out'></span></td>"
-                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flow'></span></td>"
-                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flowtotal'></span></td>"
-                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-datetime'></span></td>"
+                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-p_out'>-</span></td>"
+                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flow'>-</span></td>"
+                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-flowtotal'>-</span></td>"
+                  html_table += "<td class='text-center'><span class='" + data_temp.device_id + "-datetime'>-</span></td>"
                   html_table += "</tr>"
                   device_topic.push(data_temp.device_id)
                 })
@@ -248,8 +249,12 @@ include_once '../authen.php';
 
           client.connect({
             onSuccess: onConnect,
-            reconnect: true,
+            onFailure: function() {
+              toastr.error("ไม่สามารถเชื่อมต่อ MQTT server ได้");
+            },
+            reconnect: true
           });
+
         }
 
 
@@ -259,7 +264,7 @@ include_once '../authen.php';
           $.each(topic, function(index, value) {
             client.subscribe("relogger/" + value + "");
           })
-          
+
         }
 
         function onConnectionLost(responseObject) {

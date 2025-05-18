@@ -12,10 +12,11 @@ try{
     $device_id = $_POST['device_id'];
     $series_id = $_POST['select_ddl_series'];
     $company_id = $_POST['select_ddl_company_modal_device'];
+    $is_control = $_POST['is_control'];
     $updated_by = $_SESSION['AD_NAME'];
 
     $conmand = $conn->prepare(" UPDATE devicelist SET serial = :serial ,
-    device_id = :device_id, series_id = :series_id , company_id = :company_id , updated_by = :updated_by , updated_date = now() where id = :id") ;
+    device_id = :device_id, series_id = :series_id , company_id = :company_id , updated_by = :updated_by , updated_date = now() , is_control = :is_control where id = :id") ;
 
     $conmand->execute([
         "id" => (int)$id,
@@ -24,6 +25,7 @@ try{
         "series_id" => (int)$series_id,
         "company_id" => (int)$company_id,
         "updated_by" => (string)$updated_by,
+        "is_control" => (int)$is_control
     ]);
 
     $response = [

@@ -14,18 +14,28 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
         }
 
         $stmt = $conn->prepare("SELECT
-        a.id_name,a.p_out , a.p_in , a.flowrate , a.flowtotal , a.datetime
-   FROM
-       data_1min AS a INNER JOIN devicelist d on d.device_id = a.id_name
-   WHERE d.company_id = :company_id AND
-       a.datetime = (
-           SELECT
-               MAX(datetime)
-           FROM
-               realtime_data_1 AS b
-           WHERE
-               b.id_name = a.id_name
-       )");
+    a.id_name,
+    a.p_out,
+    a.p_in,
+    a.flowrate,
+    a.flowtotal,
+    a.datetime
+FROM
+    (
+        SELECT
+            id_name,
+            MAX(datetime) AS max_datetime
+        FROM
+            data_1min
+        GROUP BY
+            id_name
+    ) AS latest
+JOIN data_1min a
+    ON a.id_name = latest.id_name AND a.datetime = latest.max_datetime
+JOIN devicelist d
+    ON d.device_id = a.id_name
+WHERE
+    d.company_id = :company_id");
         $stmt->execute([
             "company_id" => (int)$company_id
         ]);

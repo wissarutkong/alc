@@ -11,10 +11,11 @@ try{
     $device_id = $_POST['device_id'];
     $series_id = $_POST['select_ddl_series'];
     $company_id = $_POST['select_ddl_company_modal_device'];
+    $is_control = $_POST['is_control'];
     $created_by = $_SESSION['AD_NAME'];
 
-    $sql = "INSERT INTO devicelist(company_id,series_id,serial,device_id, created_by,created_date)
-    VALUES ('$company_id','$series_id','$serial','$device_id','$created_by',now()) ";
+    $sql = "INSERT INTO devicelist(company_id,series_id,serial,device_id, created_by,created_date,is_control)
+    VALUES ('$company_id','$series_id','$serial','$device_id','$created_by',now(),'$is_control') ";
 
     $conmand = $conn->prepare($sql) ;
 

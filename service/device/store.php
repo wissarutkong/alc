@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
     try {
         if (!empty($company_id)) {
             $stmt = $conn->prepare("SELECT
-        d.id, d.device_desc , d.device_id , d.serial , s.series_desc , c.company_desc , st.site_desc , d.created_by , d.created_date 
+        d.id, d.device_desc , d.device_id , d.serial , s.series_desc , c.company_desc , st.site_desc , d.created_by , d.created_date , d.is_control
     FROM
         devicelist d
     INNER JOIN company c ON d.company_id = c.id
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
             ]);
         } else {
             $stmt = $conn->prepare("SELECT
-        d.id, d.device_desc , d.device_id , d.serial , s.series_desc , c.company_desc , st.site_desc , d.created_by , d.created_date 
+        d.id, d.device_desc , d.device_id , d.serial , s.series_desc , c.company_desc , st.site_desc , d.created_by , d.created_date , d.is_control
     FROM
         devicelist d
     INNER JOIN company c ON d.company_id = c.id

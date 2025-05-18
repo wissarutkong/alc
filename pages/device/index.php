@@ -184,6 +184,17 @@ require_once '../permission.php';
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="is_control">Control</label>
+                                                <select id="is_control" name="is_control" class="form-control select2bs4" style="width: 100%;">
+                                                    <option value="0">อุปกรณ์ทั่วไป</option>
+                                                    <option value="1">อุปกรณ์ควบคุมอัตโนมัติ</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-primary col-md-4 col-sm-12 btn-block">บันทึก</button>
                                         </div>
@@ -454,6 +465,7 @@ require_once '../permission.php';
 
                 $(document).on("click", ".open-modal-device", function() {
                     var deviceId = $(this).data('id');
+                    var is_control = $(this).data('control');
                     $('#devices_id').val('');
                     $('#device_modal').modal({
                         backdrop: 'static',
@@ -465,11 +477,13 @@ require_once '../permission.php';
                             if (deviceId != "") {
                                 $('#txt_title_device').text("แก้ไขข้อมูลอุปกรณ์")
                                 $('#devices_id').val(deviceId);
+                                $('#is_control').val(is_control).trigger('change')
                                 getDatainfo(deviceId)
                             } else {
                                 $('#txt_title_device').text("เพิ่มอุปกรณ์")
                                 $('input[name="serial"]').val('')
                                 $('input[name="device_id"]').val('')
+                                $('#is_control').val('0').trigger('change')
                             }
                         })
 
@@ -535,7 +549,7 @@ require_once '../permission.php';
                                 item.created_by,
                                 item.created_date,
                                 `<div class="btn-group" role="group">
-                                <a href="#" type="button" class="btn btn-warning text-white open-modal-device" data-toggle="modal" data-id="${item.id}">
+                                <a href="#" type="button" class="btn btn-warning text-white open-modal-device" data-toggle="modal" data-id="${item.id}" data-control="${item.is_control}">
                                     <i class="far fa-edit"></i> แก้ไข
                                 </a>
                                 <a href="#" type="button" class="btn btn-success text-white open-modal-site" data-toggle="modal" data-id="${item.id}">
